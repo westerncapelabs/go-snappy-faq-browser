@@ -4,11 +4,11 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
-    var BookletState = vumigo.states.BookletState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
         var $ = self.$;
+
 
         self.init = function() {
             return self.im.contacts
@@ -18,9 +18,11 @@ go.app = function() {
                 });
         };
 
+
         self.states.add('states_start', function(name) {
             return new ChoiceState(name, {
                 question: $('Welcome to FAQ Browser. Choose topic:'),
+
                 choices: [
                     new Choice('topic_1', $('Topic 1')),
                     new Choice('topic_2', $('Topic 2')),

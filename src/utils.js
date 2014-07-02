@@ -1,7 +1,4 @@
 var _ = require('lodash');
-var vumigo = require('vumigo_v02');
-var HttpApi = vumigo.http.api.HttpApi;
-// var JsonApi = api.JsonApi;
 
 go.utils = {
     // Shared utils lib
@@ -72,47 +69,6 @@ go.utils = {
                 if(result.value === null) return default_value;
                 return result.value;
             });
-    },
-
-    get_snappy_topics: function (acc_id, faq_id, im) {
-        var http = new HttpApi(im, {
-          auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
-            password: 'x'
-          }
-        });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
-        });
-    },
-
-    get_snappy_questions: function(json_doc, im, acc_id, faq_id, topic_id) {
-
-        acc_id = typeof acc_id !== 'undefined' ? acc_id : 1;
-        faq_id = typeof faq_id !== 'undefined' ? faq_id : 1;
-
-        var http = new HttpApi(im, {
-          auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
-            password: 'x'
-          },
-          headers: {
-            'Content-Type': ['application/json']
-          }
-        });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          ssl_method: "SSLv3",
-          data: JSON.stringify(json_doc)
-        });
-
-    },
-
-    get_snappy_answer: function() {
-
     },
 
 };

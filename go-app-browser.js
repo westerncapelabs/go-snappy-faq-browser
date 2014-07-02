@@ -1,37 +1,7 @@
 var go = {};
 go;
 
-go.paginated_extension = function() {
-	var vumigo = require('vumigo_v02');
-	var _ = require('lodash');
-	var Choice = vumigo.states.Choice;
-	var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
-
-	var MenuChoiceState = PaginatedChoiceState.extend(function(self, name, opts) {
-		PaginatedChoiceState.call(self, name, opts);
-		
-		var current_choices = self.current_choices;
-
-		self.current_choices = function() {
-			var choices = current_choices();
-			var index = _.findIndex(choices, function(choice) {
-				return choice.value === '__more__' || choice.value === '__back__';
-			});
-
-			choices.splice(index, 0, new Choice('states:start', 'Menu'));
-
-			return choices;
-		};
-	});
-
-	return {
-		MenuChoiceState: MenuChoiceState
-	};
-}();
 var _ = require('lodash');
-var vumigo = require('vumigo_v02');
-var HttpApi = vumigo.http.api.HttpApi;
-// var JsonApi = api.JsonApi;
 
 go.utils = {
     // Shared utils lib
@@ -104,47 +74,6 @@ go.utils = {
             });
     },
 
-    get_snappy_topics: function (acc_id, faq_id, im) {
-        var http = new HttpApi(im, {
-          auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
-            password: 'x'
-          }
-        });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
-        });
-    },
-
-    get_snappy_questions: function(json_doc, im, acc_id, faq_id, topic_id) {
-
-        acc_id = typeof acc_id !== 'undefined' ? acc_id : 1;
-        faq_id = typeof faq_id !== 'undefined' ? faq_id : 1;
-
-        var http = new HttpApi(im, {
-          auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
-            password: 'x'
-          },
-          headers: {
-            'Content-Type': ['application/json']
-          }
-        });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          ssl_method: "SSLv3",
-          data: JSON.stringify(json_doc)
-        });
-
-    },
-
-    get_snappy_answer: function() {
-
-    },
-
 };
 
 go.app = function() {
@@ -153,11 +82,11 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
-    var BookletState = vumigo.states.BookletState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
         var $ = self.$;
+
 
         self.init = function() {
             return self.im.contacts
@@ -167,9 +96,11 @@ go.app = function() {
                 });
         };
 
+
         self.states.add('states_start', function(name) {
             return new ChoiceState(name, {
                 question: $('Welcome to FAQ Browser. Choose topic:'),
+
                 choices: [
                     new Choice('topic_1', $('Topic 1')),
                     new Choice('topic_2', $('Topic 2')),
@@ -203,6 +134,8 @@ go.init = function() {
     var vumigo = require('vumigo_v02');
     var InteractionMachine = vumigo.InteractionMachine;
     var GoFAQBrowser = go.app.GoFAQBrowser;
+
+
     return {
         im: new InteractionMachine(api, new GoFAQBrowser())
     };

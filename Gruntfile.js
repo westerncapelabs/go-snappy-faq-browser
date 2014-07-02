@@ -14,6 +14,7 @@ module.exports = function (grunt) {
                 },
                 browser: [
                     'src/index.js',
+                    'src/paginated_extension.js',
                     'src/utils.js',
                     '<%= paths.src.app.browser %>',
                     'src/init.js'

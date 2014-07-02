@@ -11,7 +11,7 @@ describe("app", function() {
 
         beforeEach(function() {
             app = new go.app.GoFAQBrowser();
-            
+
             tester = new AppTester(app);
 
             tester
@@ -49,7 +49,7 @@ describe("app", function() {
                     .run();
             });
         });
-            
+
         describe("When the user chooses topic 1", function() {
             it("should thank them and exit", function() {
                 return tester

@@ -4,7 +4,7 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
-    var BookletState = vumigo.states.BookletState;
+    // var BookletState = vumigo.states.BookletState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');

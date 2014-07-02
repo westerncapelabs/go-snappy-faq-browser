@@ -107,11 +107,11 @@ go.utils = {
     get_snappy_topics: function (acc_id, faq_id, im) {
         var http = new HttpApi(im, {
           auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
+            username: im.config.snappy.username,
             password: 'x'
           }
         });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics', {
+        return http.get(im.config.snappy.endpoint + 'account/'+acc_id+'/faqs/'+faq_id+'/topics', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']
@@ -127,14 +127,14 @@ go.utils = {
 
         var http = new HttpApi(im, {
           auth: {
-            username: '61c7e9b452c2b1f384fb64799769970c4f5eb65c2bb29408465f3380e31545de',
+            username: im.config.snappy.username,
             password: 'x'
           },
           headers: {
             'Content-Type': ['application/json']
           }
         });
-        return http.get('https://app.besnappy.com/api/v1/account/'+acc_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+        return http.get(im.config.snappy.endpoint + 'account/'+acc_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
           ssl_method: "SSLv3",
           data: JSON.stringify(json_doc)
         });
@@ -153,7 +153,7 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
-    var BookletState = vumigo.states.BookletState;
+    // var BookletState = vumigo.states.BookletState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');

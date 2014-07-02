@@ -24,6 +24,10 @@ describe("app", function() {
                     testing_today: 'April 4, 2014 07:07:07',
                     endpoints: {
                         "sms": {"delivery_class": "sms"}
+                    },
+                    snappy: {
+                        "endpoint": "https://app.besnappy.com/api/v1/",
+                        "username": "980d2423-292b-4c34-be81-c74784b9e99a"
                     }
                 })
                 .setup(function(api) {

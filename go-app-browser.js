@@ -31,7 +31,7 @@ go.paginated_extension = function() {
 var _ = require('lodash');
 var vumigo = require('vumigo_v02');
 var HttpApi = vumigo.http.api.HttpApi;
-// var JsonApi = api.JsonApi;
+var JsonApi = vumigo.http.api.JsonApi;
 
 go.utils = {
     // Shared utils lib
@@ -104,14 +104,14 @@ go.utils = {
             });
     },
 
-    get_snappy_topics: function (acc_id, faq_id, im) {
-        var http = new HttpApi(im, {
+    get_snappy_topics: function (faq_id, im) {
+        var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
             password: 'x'
           }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+acc_id+'/faqs/'+faq_id+'/topics', {
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']
@@ -168,19 +168,26 @@ go.app = function() {
         };
 
         self.states.add('states_start', function(name) {
-            return new ChoiceState(name, {
-                question: $('Welcome to FAQ Browser. Choose topic:'),
-                choices: [
-                    new Choice('topic_1', $('Topic 1')),
-                    new Choice('topic_2', $('Topic 2')),
-                    new Choice('topic_3', $('Topic 3')),
-                    new Choice('topic_4', $('Topic 4')),
-                    new Choice('topic_5', $('Topic 5'))
-                ],
+            return go.utils.get_snappy_topics(self.im.config.snappy.default_faq, self.im)
+                .then(function(response) {
 
-                next: 'states_end'
+                    if (typeof response.data.error  !== 'undefined') {
+                        // TODO Throw proper error
+                        return error;
+                    } else {
+                        return response.data.map(function(d) {
+                            return new Choice(d.id, d.topic);
+                        });
+                    }
+                })
+                .then(function(choices) {
+                    return new ChoiceState(name, {
+                        question: $('Welcome to FAQ Browser. Choose topic:'),
+                        choices: choices,
 
-            });
+                        next: 'states_end'
+                    });
+                });
         });
 
         self.states.add('states_end', function(name) {

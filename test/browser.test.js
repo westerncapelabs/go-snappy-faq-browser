@@ -27,7 +27,9 @@ describe("app", function() {
                     },
                     snappy: {
                         "endpoint": "https://app.besnappy.com/api/v1/",
-                        "username": "980d2423-292b-4c34-be81-c74784b9e99a"
+                        "username": "980d2423-292b-4c34-be81-c74784b9e99a",
+                        "account_id": "1",
+                        "default_faq": "1"
                     }
                 })
                 .setup(function(api) {
@@ -43,11 +45,12 @@ describe("app", function() {
                         state: 'states_start',
                         reply: [
                             'Welcome to FAQ Browser. Choose topic:',
-                            '1. Topic 1',
-                            '2. Topic 2',
-                            '3. Topic 3',
-                            '4. Topic 4',
-                            '5. Topic 5'
+                            '1. Coffee',
+                            '2. delivery',
+                            '3. Payment',
+                            '4. PowerBar',
+                            '5. Refund',
+                            '6. Subscriptions'
                         ].join('\n')
                     })
                     .run();

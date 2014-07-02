@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var vumigo = require('vumigo_v02');
 var HttpApi = vumigo.http.api.HttpApi;
-// var JsonApi = api.JsonApi;
+var JsonApi = vumigo.http.api.JsonApi;
 
 go.utils = {
     // Shared utils lib
@@ -74,14 +74,14 @@ go.utils = {
             });
     },
 
-    get_snappy_topics: function (acc_id, faq_id, im) {
-        var http = new HttpApi(im, {
+    get_snappy_topics: function (faq_id, im) {
+        var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
             password: 'x'
           }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+acc_id+'/faqs/'+faq_id+'/topics', {
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']

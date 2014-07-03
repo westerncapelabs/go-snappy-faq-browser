@@ -71,7 +71,7 @@ module.exports = function () {
                     'Authorization': ['Basic ' + new Buffer('test:test').toString('base64')],
                     'Content-Type': ['application/json']
                 },
-                'url': 'https://app.besnappy.com/api/v1/account/1/faqs/1/topics/1/questions'
+                'url': 'https://app.besnappy.com/api/v1/account/1/faqs/1/topics/52/questions'
             },
             'response': {
                 "code": 200,

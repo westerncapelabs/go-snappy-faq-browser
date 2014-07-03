@@ -30,7 +30,6 @@ go.paginated_extension = function() {
 }();
 var _ = require('lodash');
 var vumigo = require('vumigo_v02');
-var HttpApi = vumigo.http.api.HttpApi;
 var JsonApi = vumigo.http.api.JsonApi;
 
 go.utils = {
@@ -104,7 +103,7 @@ go.utils = {
             });
     },
 
-    get_snappy_topics: function (faq_id, im) {
+    get_snappy_topics: function (im, faq_id) {
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -120,25 +119,20 @@ go.utils = {
         });
     },
 
-    get_snappy_questions: function(json_doc, im, acc_id, faq_id, topic_id) {
-
-        acc_id = typeof acc_id !== 'undefined' ? acc_id : 1;
-        faq_id = typeof faq_id !== 'undefined' ? faq_id : 1;
-
-        var http = new HttpApi(im, {
+    get_snappy_questions: function(im, faq_id, topic_id) {
+        var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
             password: 'x'
-          },
-          headers: {
-            'Content-Type': ['application/json']
           }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+acc_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          ssl_method: "SSLv3",
-          data: JSON.stringify(json_doc)
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+          data: JSON.stringify(),
+          headers: {
+            'Content-Type': ['application/json']
+          },
+          ssl_method: "SSLv3"
         });
-
     },
 
     get_snappy_answer: function() {
@@ -153,7 +147,7 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
-    // var BookletState = vumigo.states.BookletState;
+    var BookletState = vumigo.states.BookletState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
@@ -168,7 +162,7 @@ go.app = function() {
         };
 
         self.states.add('states_start', function(name) {
-            return go.utils.get_snappy_topics(self.im.config.snappy.default_faq, self.im)
+            return go.utils.get_snappy_topics(self.im, self.im.config.snappy.default_faq)
                 .then(function(response) {
 
                     if (typeof response.data.error  !== 'undefined') {
@@ -183,6 +177,44 @@ go.app = function() {
                 .then(function(choices) {
                     return new ChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
+                        choices: choices,
+
+                        next: function(resp) {
+                            return {
+                                name: 'states_questions',
+                                creator_opts: {
+                                    topic_id:resp.value // need the selected topic in here
+                                }
+                            };
+                        }
+                    });
+                });
+        });
+
+        self.states.add('states_questions', function(name, opts) {
+            return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
+                .then(function(response) {
+                    if (typeof response.data.error  !== 'undefined') {
+                        // TODO Throw proper error
+                        return error;
+                    } else {
+                        return response.data.map(function(d) {
+                            return new Choice(d.id, d.question);
+                        });
+                    }
+                })
+                .then(function(choices) {
+
+                    return new BookletState(name, {
+                        pages: choices.length,
+                        page_text: function(n) {return choices[n].label;},
+                        buttons: {"1": -1, "2": +1, "3": "exit"},
+                        footer_text:$([
+                            "1. Prev",
+                            "2. Next",
+                            "3. Exit"
+                        ].join("\n")),
+                        question: $('Please choose a question:'),
                         choices: choices,
 
                         next: 'states_end'

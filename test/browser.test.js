@@ -57,17 +57,29 @@ describe("app", function() {
             });
         });
 
+        // describe("When the user chooses topic 1", function() {
+        //     it("should list questions in topic 1", function() {
+        //         return tester
+        //             .setup.user.state('states_questions')
+        //             .input('52')
+        //             .check.interaction({
+        //                 state: 'states_end',
+        //                 reply: ('Please choose a question:')
+        //             })
+        //             .check.reply.ends_session()
+        //             .run();
+        //     });
+        // });
+
         describe("When the user chooses topic 1", function() {
-            it("should thank them and exit", function() {
+            it("should list questions in topic 1", function() {
                 return tester
                     .setup.user.state('states_start')
                     .input('1')
                     .check.interaction({
-                        state: 'states_end',
-                        reply: ('Thank you. That topic is not ready yet. ' +
-                                'Dial again soon!')
+                        state: 'states_questions',
+                        reply: ('Can I order more than one box at a time?\n1. Prev\n2. Next\n3. Exit')
                     })
-                    .check.reply.ends_session()
                     .run();
             });
         });

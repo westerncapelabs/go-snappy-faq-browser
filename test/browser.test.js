@@ -57,27 +57,26 @@ describe("app", function() {
             });
         });
 
-        // describe("When the user chooses topic 1", function() {
-        //     it("should list questions in topic 1", function() {
-        //         return tester
-        //             .setup.user.state('states_questions')
-        //             .input('52')
-        //             .check.interaction({
-        //                 state: 'states_end',
-        //                 reply: ('Please choose a question:')
-        //             })
-        //             .check.reply.ends_session()
-        //             .run();
-        //     });
-        // });
-
         describe("When the user chooses topic 1", function() {
             it("should list questions in topic 1", function() {
                 return tester
-                    .setup.user.state('states_start')
+                    .setup.user.state('states_questions')
                     .input('1')
                     .check.interaction({
                         state: 'states_questions',
+                        reply: ('Can I order more than one box at a time?')
+                    })
+                    .run();
+            });
+        });
+
+        describe("When the user chooses question 1", function() {
+            it("should show answer to question 1", function() {
+                return tester
+                    .setup.user.state('states_answers')
+                    .input('1')
+                    .check.interaction({
+                        state: 'states_answers',
                         reply: ('Can I order more than one box at a time?\n1. Prev\n2. Next\n3. Exit')
                     })
                     .run();

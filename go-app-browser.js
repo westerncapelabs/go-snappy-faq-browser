@@ -135,8 +135,20 @@ go.utils = {
         });
     },
 
-    get_snappy_answer: function() {
-
+    get_snappy_answers: function(im, faq_id, question_id) {
+        var http = new JsonApi(im, {
+          auth: {
+            username: im.config.snappy.username,
+            password: 'x'
+          }
+        });
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+          data: JSON.stringify(),
+          headers: {
+            'Content-Type': ['application/json']
+          },
+          ssl_method: "SSLv3"
+        });
     },
 
 };
@@ -161,10 +173,10 @@ go.app = function() {
                 });
         };
 
+        // Start
         self.states.add('states_start', function(name) {
             return go.utils.get_snappy_topics(self.im, self.im.config.snappy.default_faq)
                 .then(function(response) {
-
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
                         return error;
@@ -178,12 +190,11 @@ go.app = function() {
                     return new ChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
-
-                        next: function(resp) {
+                        next: function(choice) {
                             return {
                                 name: 'states_questions',
                                 creator_opts: {
-                                    topic_id:resp.value // need the selected topic in here
+                                    topic_id:choice.value // need the selected topic in here
                                 }
                             };
                         }
@@ -191,8 +202,43 @@ go.app = function() {
                 });
         });
 
+        // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
+
+            console.log(opts);
+
             return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
+                .then(function(response) {
+
+                    if (typeof response.data.error  !== 'undefined') {
+                        // TODO Throw proper error
+                        return error;
+                    } else {
+                        return response.data.map(function(d) {
+                            return new Choice(d.id, d.topic);
+                        });
+                    }
+                })
+                .then(function(choices) {
+                    return new ChoiceState(name, {
+                        question: $('Please choose a question:'),
+                        choices: choices,
+
+                        next: function(resp) {
+                            return {
+                                name: 'states_answers',
+                                creator_opts: {
+                                    question_id:resp.value // need the selected question in here
+                                }
+                            };
+                        }
+                    });
+                });
+        });
+
+        // Show answer in question x
+        self.states.add('states_answers', function(name, opts) {
+            return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.question_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error

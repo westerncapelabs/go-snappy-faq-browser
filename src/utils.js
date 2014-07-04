@@ -105,8 +105,20 @@ go.utils = {
         });
     },
 
-    get_snappy_answer: function() {
-
+    get_snappy_answers: function(im, faq_id, question_id) {
+        var http = new JsonApi(im, {
+          auth: {
+            username: im.config.snappy.username,
+            password: 'x'
+          }
+        });
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+          data: JSON.stringify(),
+          headers: {
+            'Content-Type': ['application/json']
+          },
+          ssl_method: "SSLv3"
+        });
     },
 
 };

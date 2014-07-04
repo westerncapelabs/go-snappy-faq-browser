@@ -15,7 +15,7 @@ describe("app", function() {
             tester = new AppTester(app);
 
             tester
-                .setup.char_limit(160)
+                .setup.char_limit(255)
                 .setup.config.app({
                     name: 'snappy_browser_test',
                     env: 'test',
@@ -57,24 +57,24 @@ describe("app", function() {
             });
         });
 
-        describe("When the user chooses topic 1", function() {
-            it("should list questions in topic 1", function() {
+        describe("when the user chooses topic 52", function() {
+            it("should list questions in topic 52", function() {
                 return tester
-                    .setup.user.state('states_questions')
+                    .setup.user.state('states_start')
                     .input('1')
                     .check.interaction({
                         state: 'states_questions',
-                        reply: ('Can I order more than one box at a time?')
+                        reply: ("Please choose a question:\n1. Can I order more than one box at a time?\n2. What happens if I fall in love with one particular coffee?\n3. What happens if I realise the amount of coffee I've ordered doesn't suit me?")
                     })
                     .run();
             });
         });
 
-        describe("When the user chooses question 1", function() {
-            it("should show answer to question 1", function() {
+        describe("When the user chooses question 635", function() {
+            it("should show answer to question 635", function() {
                 return tester
-                    .setup.user.state('states_answers')
-                    .input('1')
+                    .setup.user.state('states_questions')
+                    .input('52')
                     .check.interaction({
                         state: 'states_answers',
                         reply: ('Can I order more than one box at a time?\n1. Prev\n2. Next\n3. Exit')

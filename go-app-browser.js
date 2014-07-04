@@ -56,7 +56,7 @@ go.utils = {
     },
 
     check_number_in_range: function(input, start, end){
-        return go.utils.check_valid_number(input) && (parseInt(input, 10) >= start) && (parseInt(input, 10) <= end);
+        return go.utils.check_valid_number(input) && (parseInt(input, get_snappy_questions0) >= start) && (parseInt(input, 10) <= end);
     },
 
     is_true: function(bool) {
@@ -135,7 +135,9 @@ go.utils = {
         });
     },
 
-    get_snappy_answers: function(im, faq_id, question_id) {
+    get_snappy_answers: function(im, faq_id, topic_id, question_id) {
+        console.log("Topic ID: "+topic_id);
+        console.log("Question ID: "+question_id);
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -204,18 +206,14 @@ go.app = function() {
 
         // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
-
-            console.log(opts);
-
             return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
                 .then(function(response) {
-
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
                         return error;
                     } else {
                         return response.data.map(function(d) {
-                            return new Choice(d.id, d.topic);
+                            return new Choice(d.id, d.question);
                         });
                     }
                 })
@@ -224,11 +222,12 @@ go.app = function() {
                         question: $('Please choose a question:'),
                         choices: choices,
 
-                        next: function(resp) {
+                        next: function(choice) {
                             return {
                                 name: 'states_answers',
                                 creator_opts: {
-                                    question_id:resp.value // need the selected question in here
+                                    topic_id: opts.topic_id,
+                                    question_id: resp.value // need the selected question in here
                                 }
                             };
                         }
@@ -238,12 +237,15 @@ go.app = function() {
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
-            return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.question_id)
+            console.log(opts);
+            return go.utils.get_snappy_answers(self.im, self.im.config.snappy.default_faq, opts.topic_id, opts.question_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
+                        console.log('aaa');
                         return error;
                     } else {
+                        console.log('bbb');
                         return response.data.map(function(d) {
                             return new Choice(d.id, d.question);
                         });

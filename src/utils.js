@@ -26,7 +26,7 @@ go.utils = {
     },
 
     check_number_in_range: function(input, start, end){
-        return go.utils.check_valid_number(input) && (parseInt(input, 10) >= start) && (parseInt(input, 10) <= end);
+        return go.utils.check_valid_number(input) && (parseInt(input, get_snappy_questions0) >= start) && (parseInt(input, 10) <= end);
     },
 
     is_true: function(bool) {
@@ -105,7 +105,9 @@ go.utils = {
         });
     },
 
-    get_snappy_answers: function(im, faq_id, question_id) {
+    get_snappy_answers: function(im, faq_id, topic_id, question_id) {
+        console.log("Topic ID: "+topic_id);
+        console.log("Question ID: "+question_id);
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,

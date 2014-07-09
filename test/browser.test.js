@@ -74,7 +74,7 @@ describe("app", function() {
             it("should show answer to question 635", function() {
                 return tester
                     .setup.user.state('states_questions')
-                    .input('52')
+                    .setup.user.answers({'states:states_start': '52'})
                     .check.interaction({
                         state: 'states_answers',
                         reply: ('Can I order more than one box at a time?\n1. Prev\n2. Next\n3. Exit')

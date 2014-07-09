@@ -64,13 +64,12 @@ go.app = function() {
                     return new ChoiceState(name, {
                         question: $('Please choose a question:'),
                         choices: choices,
-
                         next: function(choice) {
                             return {
                                 name: 'states_answers',
                                 creator_opts: {
-                                    topic_id: opts.topic_id,
-                                    question_id: resp.value // need the selected question in here
+                                    topic_id: self.im.user.answers.states_start,
+                                    question_id: choice.value // need the selected question in here
                                 }
                             };
                         }
@@ -80,15 +79,12 @@ go.app = function() {
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
-            console.log(opts);
             return go.utils.get_snappy_answers(self.im, self.im.config.snappy.default_faq, opts.topic_id, opts.question_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
-                        console.log('aaa');
                         return error;
                     } else {
-                        console.log('bbb');
                         return response.data.map(function(d) {
                             return new Choice(d.id, d.question);
                         });

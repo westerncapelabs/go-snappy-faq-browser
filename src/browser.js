@@ -49,6 +49,7 @@ go.app = function() {
 
         // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
+            console.log(opts);
             return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
@@ -79,6 +80,7 @@ go.app = function() {
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
+            console.log('hi');
             return go.utils.get_snappy_answers(self.im, self.im.config.snappy.default_faq, opts.topic_id, opts.question_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {

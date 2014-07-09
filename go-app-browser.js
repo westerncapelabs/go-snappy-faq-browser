@@ -56,7 +56,7 @@ go.utils = {
     },
 
     check_number_in_range: function(input, start, end){
-        return go.utils.check_valid_number(input) && (parseInt(input, get_snappy_questions0) >= start) && (parseInt(input, 10) <= end);
+        return go.utils.check_valid_number(input) && (parseInt(input, 0) >= start) && (parseInt(input, 10) <= end);
     },
 
     is_true: function(bool) {
@@ -120,6 +120,8 @@ go.utils = {
     },
 
     get_snappy_questions: function(im, faq_id, topic_id) {
+        console.log('faq id:'+faq_id);
+        console.log('topic id:'+topic_id);
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -206,6 +208,7 @@ go.app = function() {
 
         // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
+            console.log(opts);
             return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
@@ -236,6 +239,7 @@ go.app = function() {
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
+            console.log('hi');
             return go.utils.get_snappy_answers(self.im, self.im.config.snappy.default_faq, opts.topic_id, opts.question_id)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {

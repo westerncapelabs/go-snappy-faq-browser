@@ -90,8 +90,6 @@ go.utils = {
     },
 
     get_snappy_questions: function(im, faq_id, topic_id) {
-        console.log('faq id:'+faq_id);
-        console.log('topic id:'+topic_id);
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -107,16 +105,14 @@ go.utils = {
         });
     },
 
-    get_snappy_answers: function(im, faq_id, topic_id, question_id) {
-        console.log("Topic ID: "+topic_id);
-        console.log("Question ID: "+question_id);
+    get_snappy_answers: function(im, faq_id, topic_id) {
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
             password: 'x'
           }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions?id=x', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']

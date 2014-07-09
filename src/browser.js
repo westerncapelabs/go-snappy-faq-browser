@@ -35,22 +35,15 @@ go.app = function() {
                     return new ChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
-                        next: function(choice) {
-                            return {
-                                name: 'states_questions',
-                                creator_opts: {
-                                    topic_id:choice.value // need the selected topic in here
-                                }
-                            };
-                        }
+                        next: 'states_questions'
                     });
                 });
         });
 
         // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
-            console.log(opts);
-            return go.utils.get_snappy_questions(self.im, self.im.config.snappy.default_faq, opts.topic_id)
+            return go.utils.get_snappy_questions(self.im, 
+                        self.im.config.snappy.default_faq, self.im.user.answers.states_start)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
@@ -65,47 +58,39 @@ go.app = function() {
                     return new ChoiceState(name, {
                         question: $('Please choose a question:'),
                         choices: choices,
-                        next: function(choice) {
-                            return {
-                                name: 'states_answers',
-                                creator_opts: {
-                                    topic_id: self.im.user.answers.states_start,
-                                    question_id: choice.value // need the selected question in here
-                                }
-                            };
-                        }
+                        next: 'states_answers'
                     });
                 });
         });
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
-            console.log('hi');
-            return go.utils.get_snappy_answers(self.im, self.im.config.snappy.default_faq, opts.topic_id, opts.question_id)
+            return go.utils.get_snappy_answers(self.im, 
+                        self.im.config.snappy.default_faq, 
+                            self.im.user.answers.states_start)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
                         return error;
                     } else {
-                        return response.data.map(function(d) {
-                            return new Choice(d.id, d.question);
-                        });
+                        // This needs to look up the object with the id
+                        // self.im.user.answers.states_questions
+                        // then pull out response.data[index].answer
+                        // and slice it up
+                        return [response.data[0].answer];
                     }
                 })
-                .then(function(choices) {
+                .then(function(pages) {
 
                     return new BookletState(name, {
-                        pages: choices.length,
-                        page_text: function(n) {return choices[n].label;},
+                        pages: pages.length,
+                        page_text: function(n) {return pages[n];},
                         buttons: {"1": -1, "2": +1, "3": "exit"},
                         footer_text:$([
                             "1. Prev",
                             "2. Next",
                             "3. Exit"
                         ].join("\n")),
-                        question: $('Please choose a question:'),
-                        choices: choices,
-
                         next: 'states_end'
                     });
                 });

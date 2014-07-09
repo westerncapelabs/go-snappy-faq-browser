@@ -64,7 +64,10 @@ describe("app", function() {
                     .input('1')
                     .check.interaction({
                         state: 'states_questions',
-                        reply: ("Please choose a question:\n1. Can I order more than one box at a time?\n2. What happens if I fall in love with one particular coffee?\n3. What happens if I realise the amount of coffee I've ordered doesn't suit me?")
+                        reply: ('Please choose a question:\n1. Can I order more than ' +
+                                'one box at a time?\n2. What happens if I fall in love ' +
+                                'with one particular coffee?\n3. What happens if I ' +
+                                'realise the amount of coffee I\'ve ordered doesn\'t suit me?')
                     })
                     .run();
             });
@@ -74,11 +77,14 @@ describe("app", function() {
             it("should show answer to question 635", function() {
                 return tester
                     .setup.user.state('states_questions')
-                    .setup.user.answers({'states:states_start': '52'})
-                    .input('635')
+                    .setup.user.answers({'states_start': '52'})
+                    .input('1')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('Can I order more than one box at a time?\n1. Prev\n2. Next\n3. Exit')
+                        reply: ('If the default box of 2 x 250g is not enough for ' +
+                            'your needs, you can increase the quantity up to 7 bags ' + 
+                            '(or consider the Bulk subscription, starting at 2kgs).' +
+                            '\n1. Prev\n2. Next\n3. Exit')
                     })
                     .run();
             });

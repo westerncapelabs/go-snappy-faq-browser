@@ -1,3 +1,7 @@
+// george notes:
+// default_faq naming is non-intuitive
+// why use opts and not just save data against user? overhead?
+
 go.app = function() {
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
@@ -45,6 +49,9 @@ go.app = function() {
             return go.utils.get_snappy_questions(self.im, 
                         self.im.config.snappy.default_faq, self.im.user.answers.states_start)
                 .then(function(response) {
+                    console.log(response.data[0].id);
+                    self.resp = response;
+                    console.log(typeof self.resp);
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
                         return error;
@@ -55,10 +62,13 @@ go.app = function() {
                     }
                 })
                 .then(function(choices) {
+                    console.log(self.resp.data[0].id);
                     return new ChoiceState(name, {
+                        metadata: self.resp,
                         question: $('Please choose a question:'),
                         choices: choices,
-                        next: 'states_answers'
+                        next: 'states_answers',
+
                     });
                 });
         });
@@ -69,6 +79,7 @@ go.app = function() {
                         self.im.config.snappy.default_faq, 
                             self.im.user.answers.states_start)
                 .then(function(response) {
+                    console.log(self.im.state.metadata);
                     if (typeof response.data.error  !== 'undefined') {
                         // TODO Throw proper error
                         return error;

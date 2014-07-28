@@ -162,7 +162,7 @@ go.app = function() {
                 });
         };
 
-        // Start
+        // Start - select topic
         self.states.add('states_start', function(name) {
             return go.utils.get_snappy_topics(self.im, self.im.config.snappy.default_faq)
                 .then(function(response) {
@@ -184,7 +184,7 @@ go.app = function() {
                 });
         });
 
-        // Show questions in topic x
+        // Show questions in selected topic
         self.states.add('states_questions', function(name, opts) {
             return go.utils.get_snappy_topic_content(self.im, 
                         self.im.config.snappy.default_faq, self.im.user.answers.states_start)
@@ -211,7 +211,7 @@ go.app = function() {
                 });
         });
 
-        // Show answer in question x
+        // Show answer to selected question
         self.states.add('states_answers', function(name, opts) {
             var id = self.im.user.answers.states_questions;
             var index = _.findIndex(opts.data, { 'id': id });

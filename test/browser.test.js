@@ -66,8 +66,8 @@ describe("app", function() {
                         state: 'states_questions',
                         reply: ('Please choose a question:\n1. Can I order more than ' +
                                 'one box at a time?\n2. What happens if I fall in love ' +
-                                'with one particular coffee?\n3. What happens if I ' +
-                                'realise the amount of coffee I\'ve ordered doesn\'t suit me?')
+                                'with one particular coffee?\n3. What happens if the ' +
+                                'FAQ answer is really long?')
                     })
                     .run();
             });
@@ -84,6 +84,41 @@ describe("app", function() {
                         reply: ('If the default box of 2 x 250g is not enough for ' +
                             'your needs, you can increase the quantity up to 7 bags ' + 
                             '(or consider the Bulk subscription, starting at 2kgs).' +
+                            '\n1. Prev\n2. Next\n3. Exit')
+                    })
+                    .run();
+            });
+        });
+
+        // test for long faq answer splitting
+        describe("When the user chooses question 999", function() {
+            it("should show the first part of the answer of 999", function() {
+                return tester
+                    .setup.user.state('states_questions')
+                    .setup.user.answers({'states_start': '52'})
+                    .inputs('3')
+                    .check.interaction({
+                        state: 'states_answers',
+                        reply: ('It will be split into multiple pages on a ' +
+                            'bookletstate, showing content on different screens ' +
+                            'as the text gets too long. To illustrate this, this ' +
+                            'super long response has been faked. This should be ' +
+                            'split over at least 2 screens just' +
+                            '\n1. Prev\n2. Next\n3. Exit')
+                    })
+                    .run();
+            });
+        });
+
+        describe("When the user chooses 2. Next", function() {
+            it("should show the second part of the answer to 999", function() {
+                return tester
+                    .setup.user.state('states_questions')
+                    .setup.user.answers({'states_start': '52'})
+                    .inputs('3', '2')
+                    .check.interaction({
+                        state: 'states_answers',
+                        reply: ('because we want to test properly. Let\'s see.' +
                             '\n1. Prev\n2. Next\n3. Exit')
                     })
                     .run();

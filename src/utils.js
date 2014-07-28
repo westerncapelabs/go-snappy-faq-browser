@@ -89,7 +89,7 @@ go.utils = {
         });
     },
 
-    get_snappy_questions: function(im, faq_id, topic_id) {
+    get_snappy_topic_content: function(im, faq_id, topic_id) {
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -97,22 +97,6 @@ go.utils = {
           }
         });
         return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
-        });
-    },
-
-    get_snappy_answers: function(im, faq_id, topic_id) {
-        var http = new JsonApi(im, {
-          auth: {
-            username: im.config.snappy.username,
-            password: 'x'
-          }
-        });
-        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions?id=x', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']

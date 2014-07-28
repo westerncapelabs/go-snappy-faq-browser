@@ -119,7 +119,7 @@ go.utils = {
         });
     },
 
-    get_snappy_questions: function(im, faq_id, topic_id) {
+    get_snappy_topic_content: function(im, faq_id, topic_id) {
         var http = new JsonApi(im, {
           auth: {
             username: im.config.snappy.username,
@@ -127,22 +127,6 @@ go.utils = {
           }
         });
         return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
-        });
-    },
-
-    get_snappy_answers: function(im, faq_id, topic_id) {
-        var http = new JsonApi(im, {
-          auth: {
-            username: im.config.snappy.username,
-            password: 'x'
-          }
-        });
-        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions?id=x', {
           data: JSON.stringify(),
           headers: {
             'Content-Type': ['application/json']
@@ -202,7 +186,7 @@ go.app = function() {
 
         // Show questions in topic x
         self.states.add('states_questions', function(name, opts) {
-            return go.utils.get_snappy_questions(self.im, 
+            return go.utils.get_snappy_topic_content(self.im, 
                         self.im.config.snappy.default_faq, self.im.user.answers.states_start)
                 .then(function(response) {
                     if (typeof response.data.error  !== 'undefined') {
@@ -212,70 +196,53 @@ go.app = function() {
                         var choices = response.data.map(function(d) {
                             return new Choice(d.id, d.question);
                         });
-                        // askmike: should we use something like the code below maybe?
-                        // var answers = response.data.map(function(d) {
-                        //     return new Choice(d.id, d.answer);
-                        // });
-                        return {
-                            choices: choices,
-                            response: response
-                            // answers: answers
-                        };
-                    }
-                })
-                .then(function(result) {
-                    return new ChoiceState(name, {
-                        metadata: self.resp,
-                        question: $('Please choose a question:'),
-                        choices: result.choices,
-                        next: function(){
-                            return {
-                                name: 'states_answers',
-                                creator_opts: result.response
-                            };
-                        }
 
-                    });
+                        return new ChoiceState(name, {
+                            question: $('Please choose a question:'),
+                            choices: choices,
+                            next: function() {
+                                return {
+                                    name: 'states_answers',
+                                    creator_opts: response
+                                };
+                            }
+                        });
+                    }
                 });
         });
 
         // Show answer in question x
         self.states.add('states_answers', function(name, opts) {
-            // TODO: simplify this state
+            var id = self.im.user.answers.states_questions;
+            var index = _.findIndex(opts.data, { 'id': id });
+            var footer_text = [
+                    "1. Prev",
+                    "2. Next",
+                    "3. Exit"
+                ].join("\n");
+            var num_chars = 255 - footer_text.length; // askmike: what to do with translated footer_text?
+            var answer = opts.data[index].answer.trim();
+            var answer_split = [];
 
-            return go.utils.get_snappy_answers(self.im, 
-                        self.im.config.snappy.default_faq, 
-                            self.im.user.answers.states_start)
-                .then(function(response) {
-                    if (typeof response.data.error  !== 'undefined') {
-                        // TODO Throw proper error
-                        return error;
-                    } else {
-                        // TODO: move to get_snappy_answers
-                        // TODO: slice answer up
-                        id = self.im.user.answers.states_questions;
-                        index = _.findIndex(opts.data, { 'id': id });
-                        answer = opts.data[index].answer;
-                        console.log(answer);
-                        return [answer];
-                    }
-                })
-                .then(function(pages) {
+            while (answer.length > 0 && answer.length > num_chars) {
+                answer_max_str = answer.substr(0,num_chars);
+                space_index = answer_max_str.lastIndexOf(' ');
+                answer_sub = answer.substr(0, space_index);
+                answer_split.push(answer_sub);
+                answer = answer.slice(space_index+1);
+            }
+            answer_split.push(answer);
 
-                    return new BookletState(name, {
-                        pages: pages.length,
-                        page_text: function(n) {return pages[n];},
-                        buttons: {"1": -1, "2": +1, "3": "exit"},
-                        footer_text:$([
-                            "1. Prev",
-                            "2. Next",
-                            "3. Exit"
-                        ].join("\n")),
-                        next: 'states_end'
-                    });
-                });
+            return new BookletState(name, {
+                pages: answer_split.length,
+                page_text: function(n) {return answer_split[n];},
+                buttons: {"1": -1, "2": +1, "3": "exit"},
+                footer_text:$(footer_text),
+                next: 'states_end'
+            });
         });
 
+        // End
         self.states.add('states_end', function(name) {
             return new EndState(name, {
                 text: $('Thank you. That topic is not ready yet. Dial again soon!'),

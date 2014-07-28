@@ -146,9 +146,10 @@ go.app = function() {
     var _ = require('lodash');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
-    var ChoiceState = vumigo.states.ChoiceState;
+    // var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
     var BookletState = vumigo.states.BookletState;
+    var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
@@ -176,7 +177,7 @@ go.app = function() {
                     }
                 })
                 .then(function(choices) {
-                    return new ChoiceState(name, {
+                    return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
                         next: 'states_questions'
@@ -197,7 +198,7 @@ go.app = function() {
                             return new Choice(d.id, d.question);
                         });
 
-                        return new ChoiceState(name, {
+                        return new PaginatedChoiceState(name, {
                             question: $('Please choose a question:'),
                             choices: choices,
                             next: function() {

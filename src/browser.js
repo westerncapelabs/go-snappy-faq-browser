@@ -40,6 +40,7 @@ go.app = function() {
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
+                        options_per_page: 8,
                         next: 'states_questions'
                     });
                 });
@@ -61,6 +62,8 @@ go.app = function() {
                         return new PaginatedChoiceState(name, {
                             question: $('Please choose a question:'),
                             choices: choices,
+                            // TODO calculate options_per_page once content length is known
+                            options_per_page: 3,
                             next: function() {
                                 return {
                                     name: 'states_answers',

@@ -58,7 +58,7 @@ describe("app", function() {
         });
 
         describe("when the user chooses topic 52", function() {
-            it("should list questions in topic 52", function() {
+            it("should list first page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_start')
                     .input('1')
@@ -67,7 +67,22 @@ describe("app", function() {
                         reply: ('Please choose a question:\n1. Can I order more than ' +
                                 'one box at a time?\n2. What happens if I fall in love ' +
                                 'with one particular coffee?\n3. What happens if the ' +
-                                'FAQ answer is really long?')
+                                'FAQ answer is really long?\n4. More')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when the user chooses topic 52 and then 4. More", function() {
+            it("should list second page of questions in topic 52", function() {
+                return tester
+                    .setup.user.state('states_start')
+                    .inputs('1', '4')
+                    .check.interaction({
+                        state: 'states_questions',
+                        reply: ('Please choose a question:\n1. What happens if I realise ' +
+                                'the amount of coffee I\'ve ordered doesn\'t suit me?' +
+                                '\n2. Back')
                     })
                     .run();
             });
@@ -110,7 +125,7 @@ describe("app", function() {
             });
         });
 
-        describe("When the user chooses 2. Next", function() {
+        describe("When the user chooses question 999 and then 2. Next", function() {
             it("should show the second part of the answer to 999", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -121,6 +136,22 @@ describe("app", function() {
                         reply: ('because we want to test properly. Let\'s see.' +
                             '\n1. Prev\n2. Next\n3. Exit')
                     })
+                    .run();
+            });
+        });
+
+        describe("When the user chooses to Exit", function() {
+            it("should thank the user and exit", function() {
+                return tester
+                    .setup.user.state('states_questions')
+                    .setup.user.answers({'states_start': '52'})
+                    .inputs('3', '3')
+                    .check.interaction({
+                        state: 'states_end',
+                        reply: ('Thank you. That topic is not ready yet. Dial ' +
+                            'again soon!')
+                    })
+                    .check.reply.ends_session()
                     .run();
             });
         });

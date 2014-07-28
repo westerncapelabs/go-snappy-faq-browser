@@ -7,7 +7,6 @@ go.app = function() {
     var _ = require('lodash');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
-    // var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
     var BookletState = vumigo.states.BookletState;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;

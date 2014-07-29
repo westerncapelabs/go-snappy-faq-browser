@@ -99,7 +99,7 @@ describe("app", function() {
                         reply: ('If the default box of 2 x 250g is not enough for ' +
                             'your needs, you can increase the quantity up to 7 bags ' + 
                             '(or consider the Bulk subscription, starting at 2kgs).' +
-                            '\n1. Prev\n2. Next\n3. Exit')
+                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });
@@ -118,8 +118,8 @@ describe("app", function() {
                             'bookletstate, showing content on different screens ' +
                             'as the text gets too long. To illustrate this, this ' +
                             'super long response has been faked. This should be ' +
-                            'split over at least 2 screens just' +
-                            '\n1. Prev\n2. Next\n3. Exit')
+                            'split over at least 2' +
+                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });
@@ -133,8 +133,8 @@ describe("app", function() {
                     .inputs('3', '2')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('because we want to test properly. Let\'s see.' +
-                            '\n1. Prev\n2. Next\n3. Exit')
+                        reply: ('screens just because we want to test properly. Let\'s see.' +
+                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });

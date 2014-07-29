@@ -82,7 +82,7 @@ go.app = function() {
             var footer_text = [
                     "1. Prev",
                     "2. Next",
-                    "3. Exit"
+                    "0. Send to me by SMS"
                 ].join("\n");
             var num_chars = 255 - footer_text.length; // askmike: what to do with translated footer_text?
             var answer = opts.data[index].answer.trim();

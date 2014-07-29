@@ -140,8 +140,8 @@ describe("app", function() {
             });
         });
 
-        describe("When the user chooses to Exit", function() {
-            it("should thank the user and exit", function() {
+        describe("When the user chooses to Send by SMS", function() {
+            it("should thank the user, send sms, and exit", function() {
                 return tester
                     .setup.user.state('states_questions')
                     .setup.user.answers({'states_start': '52'})
@@ -149,6 +149,20 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states_end',
                         reply: ('Thank you. Your SMS will be delivered shortly.')
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length, 1);
+                        assert.equal(sms.content,
+                            "It will be split into multiple pages on a bookletstate, showing " +
+                            "content on different screens as the text gets too long. To " +
+                            "illustrate this, this super long response has been faked. This " +
+                            "should be split over at least 2 screens just because we want to " +
+                            "test properly. Let\'s see."
+                        );
                     })
                     .check.reply.ends_session()
                     .run();

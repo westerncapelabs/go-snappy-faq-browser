@@ -148,8 +148,7 @@ describe("app", function() {
                     .inputs('3', '3')
                     .check.interaction({
                         state: 'states_end',
-                        reply: ('Thank you. That topic is not ready yet. Dial ' +
-                            'again soon!')
+                        reply: ('Thank you. Your SMS will be delivered shortly.')
                     })
                     .check.reply.ends_session()
                     .run();

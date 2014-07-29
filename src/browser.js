@@ -109,7 +109,7 @@ go.app = function() {
         // End
         self.states.add('states_end', function(name) {
             return new EndState(name, {
-                text: $('Thank you. That topic is not ready yet. Dial again soon!'),
+                text: $('Thank you. Your SMS will be delivered shortly.'),
 
                 next: 'states_start'
             });

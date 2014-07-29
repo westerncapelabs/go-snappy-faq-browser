@@ -83,7 +83,7 @@ go.app = function() {
                     "2. Next",
                     "0. Send to me by SMS"
                 ].join("\n");
-            var num_chars = 160 - footer_text.length; // askmike: what to do with translated footer_text?
+            var num_chars = 160 - footer_text.length;
             var answer = opts.response.data[index].answer.trim();
             var sms_content = answer;
             var answer_split = [];

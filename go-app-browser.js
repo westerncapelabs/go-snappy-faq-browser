@@ -110,9 +110,6 @@ go.utils = {
 
 };
 
-// george notes:
-// default_faq naming is non-intuitive
-// why use opts and not just save data against user? overhead?
 
 go.app = function() {
     var vumigo = require('vumigo_v02');

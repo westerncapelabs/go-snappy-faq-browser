@@ -86,6 +86,7 @@ go.app = function() {
                 ].join("\n");
             var num_chars = 255 - footer_text.length; // askmike: what to do with translated footer_text?
             var answer = opts.data[index].answer.trim();
+            var sms_content = answer;
             var answer_split = [];
 
             while (answer.length > 0 && answer.length > num_chars) {
@@ -102,16 +103,30 @@ go.app = function() {
                 page_text: function(n) {return answer_split[n];},
                 buttons: {"1": -1, "2": +1, "3": "exit"},
                 footer_text:$(footer_text),
-                next: 'states_end'
+                next: function() {
+                    return {
+                        name: 'states_end',
+                        creator_opts: sms_content
+                    };
+                }
             });
         });
 
         // End
-        self.states.add('states_end', function(name) {
+        self.states.add('states_end', function(name, opts) {
             return new EndState(name, {
                 text: $('Thank you. Your SMS will be delivered shortly.'),
 
-                next: 'states_start'
+                next: 'states_start',
+
+                events: {
+                    'state:enter': function() {
+                        return self.im.outbound.send_to_user({
+                            endpoint: 'sms',
+                            content: opts
+                        });
+                    }
+                }
             });
         });
 

@@ -63,7 +63,7 @@ go.app = function() {
                             question: $('Please choose a question:'),
                             choices: choices,
                             // TODO calculate options_per_page once content length is known
-                            options_per_page: 3,
+                            options_per_page: 2,
                             next: function() {
                                 return {
                                     name: 'states_answers',
@@ -86,7 +86,7 @@ go.app = function() {
                     "2. Next",
                     "0. Send to me by SMS"
                 ].join("\n");
-            var num_chars = 255 - footer_text.length; // askmike: what to do with translated footer_text?
+            var num_chars = 160 - footer_text.length; // askmike: what to do with translated footer_text?
             var answer = opts.response.data[index].answer.trim();
             var sms_content = answer;
             var answer_split = [];

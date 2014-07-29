@@ -15,7 +15,7 @@ describe("app", function() {
             tester = new AppTester(app);
 
             tester
-                .setup.char_limit(255)
+                .setup.char_limit(160)
                 .setup.config.app({
                     name: 'snappy_browser_test',
                     env: 'test',
@@ -37,7 +37,7 @@ describe("app", function() {
                 });
         });
 
-        describe("when the user starts a session", function() {
+        describe("T1. When the user starts a session", function() {
             it("should welcome and ask to choose topic", function() {
                 return tester
                     .start()
@@ -57,7 +57,7 @@ describe("app", function() {
             });
         });
 
-        describe("when the user chooses topic 52", function() {
+        describe("T2. When the user chooses topic 52", function() {
             it("should list first page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_start')
@@ -66,29 +66,29 @@ describe("app", function() {
                         state: 'states_questions',
                         reply: ('Please choose a question:\n1. Can I order more than ' +
                                 'one box at a time?\n2. What happens if I fall in love ' +
-                                'with one particular coffee?\n3. What happens if the ' +
-                                'FAQ answer is really long?\n4. More')
+                                'with one particular coffee?\n3. More')
                     })
                     .run();
             });
         });
 
-        describe("when the user chooses topic 52 and then 4. More", function() {
+        describe("T3. When the user chooses topic 52 and then 3. More", function() {
             it("should list second page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_start')
-                    .inputs('1', '4')
+                    .inputs('1', '3')
                     .check.interaction({
                         state: 'states_questions',
-                        reply: ('Please choose a question:\n1. What happens if I realise ' +
-                                'the amount of coffee I\'ve ordered doesn\'t suit me?' +
-                                '\n2. Back')
+                        reply: ('Please choose a question:\n1. What happens if the FAQ ' +
+                                'answer is really long?\n2. What happens if I realise ' +
+                                'the amount of coffee I\'ve ordered doesn\'t suit?' +
+                                '\n3. Back')
                     })
                     .run();
             });
         });
 
-        describe("When the user chooses question 635", function() {
+        describe("T4. When the user chooses question 635", function() {
             it("should show answer to question 635", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -98,54 +98,68 @@ describe("app", function() {
                         state: 'states_answers',
                         reply: ('If the default box of 2 x 250g is not enough for ' +
                             'your needs, you can increase the quantity up to 7 bags ' + 
-                            '(or consider the Bulk subscription, starting at 2kgs).' +
+                            '(or consider the' +
                             '\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });
         });
 
-        // test for long faq answer splitting
-        describe("When the user chooses question 999", function() {
+        // test long faq answer splitting
+        describe("T5. When the user chooses question 999", function() {
             it("should show the first part of the answer of 999", function() {
                 return tester
                     .setup.user.state('states_questions')
                     .setup.user.answers({'states_start': '52'})
-                    .inputs('3')
+                    .inputs('3', '1')
                     .check.interaction({
                         state: 'states_answers',
                         reply: ('It will be split into multiple pages on a ' +
                             'bookletstate, showing content on different screens ' +
-                            'as the text gets too long. To illustrate this, this ' +
-                            'super long response has been faked. This should be ' +
-                            'split over at least 2' +
+                            'as the text gets too long. To' +
                             '\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });
         });
 
-        describe("When the user chooses question 999 and then 2. Next", function() {
+        describe("T6. When the user chooses question 999 and then 2. Next", function() {
             it("should show the second part of the answer to 999", function() {
                 return tester
                     .setup.user.state('states_questions')
                     .setup.user.answers({'states_start': '52'})
-                    .inputs('3', '2')
+                    .inputs('3', '1', '2')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('screens just because we want to test properly. Let\'s see.' +
-                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
+                        reply: ('illustrate this, this super long response has been faked. ' + 
+                                'This should be split over at least 2 screens just because ' +
+                                'we want\n1. Prev\n2. Next\n0. Send to me by SMS')
                     })
                     .run();
             });
         });
 
-        describe("When the user chooses to Send by SMS", function() {
+        describe("T7. When the user chooses question 999 and then 2. Next twice", function() {
+            it("should show the third part of the answer to 999", function() {
+                return tester
+                    .setup.user.state('states_questions')
+                    .setup.user.answers({'states_start': '52'})
+                    .inputs('3', '1', '2', '2')
+                    .check.interaction({
+                        state: 'states_answers',
+                        reply: ('to test properly. Let\'s see.\n1. Prev\n2. Next\n0. Send ' +
+                                'to me by SMS')
+                    })
+                    .run();
+            });
+        });
+
+        describe("T8. When the user chooses to Send by SMS", function() {
             it("should thank the user, send sms, and exit", function() {
                 return tester
                     .setup.user.state('states_questions')
                     .setup.user.answers({'states_start': '52'})
-                    .inputs('3', '0')
+                    .inputs('3', '1', '0')
                     .check.interaction({
                         state: 'states_end',
                         reply: ('Thank you. Your SMS will be delivered shortly.')

@@ -176,7 +176,7 @@ module.exports = function () {
                 {
                     "id": "633",
                     "account_id": "50",
-                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit me?",
+                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit?",
                     "answer": "If you realise that you either over or underestimated your coffee needs, you can easily upgrade your subscription quantity.",
                     "created_at": "2013-11-19 09:15:46",
                     "updated_at": "2014-02-21 12:04:14",
@@ -310,7 +310,7 @@ module.exports = function () {
                 {
                     "id": "633",
                     "account_id": "50",
-                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit me?",
+                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit?",
                     "answer": "If you realise that you either over or underestimated your coffee needs, you can easily upgrade your subscription quantity.",
                     "created_at": "2013-11-19 09:15:46",
                     "updated_at": "2014-02-21 12:04:14",
@@ -421,7 +421,7 @@ module.exports = function () {
                 }, {
                     "id": "633",
                     "account_id": "50",
-                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit me?",
+                    "question": "What happens if I realise the amount of coffee I've ordered doesn't suit?",
                     "answer": "If you realise that you either over or underestimated your coffee needs, you can easily upgrade your subscription quantity.",
                     "created_at": "2013-11-19 09:15:46",
                     "updated_at": "2014-02-21 12:04:14",

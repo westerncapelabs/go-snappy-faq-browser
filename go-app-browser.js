@@ -29,7 +29,7 @@ go.utils = {
     },
 
     check_number_in_range: function(input, start, end){
-        return go.utils.check_valid_number(input) && (parseInt(input, 0) >= start) && (parseInt(input, 10) <= end);
+        return go.utils.check_valid_number(input) && (parseInt(input, 10) >= start) && (parseInt(input, 10) <= end);
     },
 
     is_true: function(bool) {

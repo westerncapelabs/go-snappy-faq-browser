@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var vumigo = require('vumigo_v02');
+var JsonApi = vumigo.http.api.JsonApi;
 
 go.utils = {
     // Shared utils lib
@@ -69,6 +71,38 @@ go.utils = {
                 if(result.value === null) return default_value;
                 return result.value;
             });
+    },
+
+    get_snappy_topics: function (im, faq_id) {
+        var http = new JsonApi(im, {
+          auth: {
+            username: im.config.snappy.username,
+            password: 'x'
+          }
+        });
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics', {
+          data: JSON.stringify(),
+          headers: {
+            'Content-Type': ['application/json']
+          },
+          ssl_method: "SSLv3"
+        });
+    },
+
+    get_snappy_topic_content: function(im, faq_id, topic_id) {
+        var http = new JsonApi(im, {
+          auth: {
+            username: im.config.snappy.username,
+            password: 'x'
+          }
+        });
+        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
+          data: JSON.stringify(),
+          headers: {
+            'Content-Type': ['application/json']
+          },
+          ssl_method: "SSLv3"
+        });
     },
 
 };

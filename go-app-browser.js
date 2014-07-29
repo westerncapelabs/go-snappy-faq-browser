@@ -179,7 +179,9 @@ go.app = function() {
                             next: function() {
                                 return {
                                     name: 'states_answers',
-                                    creator_opts: response
+                                    creator_opts: {
+                                        response: response
+                                    }
                                 };
                             }
                         });
@@ -190,14 +192,14 @@ go.app = function() {
         // Show answer to selected question
         self.states.add('states_answers', function(name, opts) {
             var id = self.im.user.answers.states_questions;
-            var index = _.findIndex(opts.data, { 'id': id });
+            var index = _.findIndex(opts.response.data, { 'id': id });
             var footer_text = [
                     "1. Prev",
                     "2. Next",
                     "0. Send to me by SMS"
                 ].join("\n");
             var num_chars = 255 - footer_text.length; // askmike: what to do with translated footer_text?
-            var answer = opts.data[index].answer.trim();
+            var answer = opts.response.data[index].answer.trim();
             var sms_content = answer;
             var answer_split = [];
 
@@ -218,7 +220,9 @@ go.app = function() {
                 next: function() {
                     return {
                         name: 'states_end',
-                        creator_opts: sms_content
+                        creator_opts: {
+                            sms_content: sms_content
+                        }
                     };
                 }
             });
@@ -235,7 +239,7 @@ go.app = function() {
                     'state:enter': function() {
                         return self.im.outbound.send_to_user({
                             endpoint: 'sms',
-                            content: opts
+                            content: opts.sms_content
                         });
                     }
                 }

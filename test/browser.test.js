@@ -145,7 +145,7 @@ describe("app", function() {
                 return tester
                     .setup.user.state('states_questions')
                     .setup.user.answers({'states_start': '52'})
-                    .inputs('3', '3')
+                    .inputs('3', '0')
                     .check.interaction({
                         state: 'states_end',
                         reply: ('Thank you. Your SMS will be delivered shortly.')

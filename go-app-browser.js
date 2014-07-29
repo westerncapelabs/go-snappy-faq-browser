@@ -196,6 +196,7 @@ go.app = function() {
                     "0. Send to me by SMS"
                 ].join("\n");
             var num_chars = 160 - footer_text.length;
+            // TODO update footer_text length calc for translations
             var answer = opts.response.data[index].answer.trim();
             var sms_content = answer;
             var answer_split = [];

@@ -64,9 +64,12 @@ describe("app", function() {
                     .input('1')
                     .check.interaction({
                         state: 'states_questions',
-                        reply: ('Please choose a question:\n1. Can I order more than ' +
-                                'one box at a time?\n2. What happens if I fall in love ' +
-                                'with one particular coffee?\n3. More')
+                        reply: [
+                            'Please choose a question:',
+                            '1. Can I order more than one box at a time?',
+                            '2. What happens if I fall in love with one particular coffee?',
+                            '3. More'
+                        ].join('\n')
                     })
                     .run();
             });
@@ -79,10 +82,12 @@ describe("app", function() {
                     .inputs('1', '3')
                     .check.interaction({
                         state: 'states_questions',
-                        reply: ('Please choose a question:\n1. What happens if the FAQ ' +
-                                'answer is really long?\n2. What happens if I realise ' +
-                                'the amount of coffee I\'ve ordered doesn\'t suit?' +
-                                '\n3. Back')
+                        reply: [
+                            'Please choose a question:',
+                            '1. What happens if the FAQ answer is really long?',
+                            '2. What happens if I realise the amount of coffee I\'ve ordered doesn\'t suit?',
+                            '3. Back'
+                        ].join('\n')
                     })
                     .run();
             });
@@ -96,10 +101,12 @@ describe("app", function() {
                     .input('1')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('If the default box of 2 x 250g is not enough for ' +
-                            'your needs, you can increase the quantity up to 7 bags ' + 
-                            '(or consider the' +
-                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
+                        reply: [
+                            'If the default box of 2 x 250g is not enough for your needs, you can increase the quantity up to 7 bags (or consider the',
+                            '1. Prev',
+                            '2. Next',
+                            '0. Send to me by SMS'
+                        ].join('\n')
                     })
                     .run();
             });
@@ -114,10 +121,12 @@ describe("app", function() {
                     .inputs('3', '1')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('It will be split into multiple pages on a ' +
-                            'bookletstate, showing content on different screens ' +
-                            'as the text gets too long. To' +
-                            '\n1. Prev\n2. Next\n0. Send to me by SMS')
+                        reply: [
+                            'It will be split into multiple pages on a bookletstate, showing content on different screens as the text gets too long. To',
+                            '1. Prev',
+                            '2. Next',
+                            '0. Send to me by SMS'
+                        ].join('\n')
                     })
                     .run();
             });
@@ -131,9 +140,12 @@ describe("app", function() {
                     .inputs('3', '1', '2')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('illustrate this, this super long response has been faked. ' + 
-                                'This should be split over at least 2 screens just because ' +
-                                'we want\n1. Prev\n2. Next\n0. Send to me by SMS')
+                        reply: [
+                            'illustrate this, this super long response has been faked. This should be split over at least 2 screens just because we want',
+                            '1. Prev',
+                            '2. Next',
+                            '0. Send to me by SMS'
+                        ].join('\n')
                     })
                     .run();
             });
@@ -147,8 +159,11 @@ describe("app", function() {
                     .inputs('3', '1', '2', '2')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ('to test properly. Let\'s see.\n1. Prev\n2. Next\n0. Send ' +
-                                'to me by SMS')
+                        reply: ['to test properly. Let\'s see.',
+                            '1. Prev',
+                            '2. Next',
+                            '0. Send to me by SMS'
+                        ].join('\n')
                     })
                     .run();
             });

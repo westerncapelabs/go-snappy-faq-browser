@@ -78,35 +78,19 @@ go.app = function() {
         self.states.add('states_answers', function(name, opts) {
             var id = self.im.user.answers.states_questions;
             var index = _.findIndex(opts.response.data, { 'id': id });
-            var footer_text = [
-                    "1. Prev",
-                    "2. Next",
-                    "0. Send to me by SMS"
-                ].join("\n");
-            var num_chars = 160 - footer_text.length;
             var answer = opts.response.data[index].answer.trim();
-            var sms_content = answer;
-            var answer_split = [];
-
-            while (answer.length > 0 && answer.length > num_chars) {
-                answer_max_str = answer.substr(0,num_chars);
-                space_index = answer_max_str.lastIndexOf(' ');
-                answer_sub = answer.substr(0, space_index);
-                answer_split.push(answer_sub);
-                answer = answer.slice(space_index+1);
-            }
-            answer_split.push(answer);
 
             return new PaginatedState(name, {
-                text: sms_content,
-                exit: "Send to me by SMS", // wrap in translation?
+                text: answer,
+                exit: "Send to me by SMS", 
+                // wrap in translation? make sure this is going into POT files
                 // buttons: {"1": -1, "2": +1, "0": "exit"}, 
                 // get buttons option again? currently auto-assigns numbers
                 next: function() {
                     return {
                         name: 'states_end',
                         creator_opts: {
-                            sms_content: sms_content
+                            answer: answer
                         }
                     };
                 }
@@ -124,7 +108,7 @@ go.app = function() {
                     'state:enter': function() {
                         return self.im.outbound.send_to_user({
                             endpoint: 'sms',
-                            content: opts.sms_content
+                            content: opts.answer
                         });
                     }
                 }

@@ -86,8 +86,6 @@ go.app = function() {
                 // wrap in translation?
                     // make sure this is going into POT files
                     // make sure More and Back are also being translated
-                // buttons: {"1": -1, "2": +1, "0": "exit"}, 
-                // get buttons option again? currently auto-assigns numbers
                 next: function() {
                     return {
                         name: 'states_end',

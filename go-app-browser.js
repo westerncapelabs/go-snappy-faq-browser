@@ -173,11 +173,15 @@ go.app = function() {
                             choices: choices,
                             // TODO calculate options_per_page once content length is known
                             options_per_page: 2,
-                            next: function() {
+                            next: function(choice) {
+                                var question_id = choice.value;
+                                var index = _.findIndex(response.data, { 'id': question_id});
+                                var answer = response.data[index].answer.trim();
+
                                 return {
                                     name: 'states_answers',
                                     creator_opts: {
-                                        response: response
+                                        answer: answer
                                     }
                                 };
                             }
@@ -188,12 +192,8 @@ go.app = function() {
 
         // Show answer to selected question
         self.states.add('states_answers', function(name, opts) {
-            var id = self.im.user.answers.states_questions;
-            var index = _.findIndex(opts.response.data, { 'id': id });
-            var answer = opts.response.data[index].answer.trim();
-
             return new PaginatedState(name, {
-                text: answer,
+                text: opts.answer,
                 exit: "Send to me by SMS", 
                 // wrap in translation? make sure this is going into POT files
                 // buttons: {"1": -1, "2": +1, "0": "exit"}, 
@@ -202,7 +202,7 @@ go.app = function() {
                     return {
                         name: 'states_end',
                         creator_opts: {
-                            answer: answer
+                            answer: opts.answer
                         }
                     };
                 }

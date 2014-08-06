@@ -212,8 +212,7 @@ go.app = function() {
             return new PaginatedState(name, {
                 text: sms_content,
                 exit: "Send to me by SMS", // wrap in translation?
-                buttons: {"1": -1, "2": +1, "0": "exit"},
-                // get buttons option again? currently auto-assigns numbers
+                // buttons: {"1": -1, "2": +1, "0": "exit"}, // get buttons option again? currently auto-assigns numbers
                 next: function() {
                     return {
                         name: 'states_end',

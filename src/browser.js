@@ -82,10 +82,9 @@ go.app = function() {
         self.states.add('states_answers', function(name, opts) {
             return new PaginatedState(name, {
                 text: opts.answer,
-                exit: $("Send to me by SMS"),
-                // wrap in translation?
-                    // make sure this is going into POT files
-                    // make sure More and Back are also being translated
+                more: $('More'),
+                back: $('Back'),
+                exit: $('Send to me by SMS'),
                 next: function() {
                     return {
                         name: 'states_end',

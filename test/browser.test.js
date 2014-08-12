@@ -57,7 +57,7 @@ describe("app", function() {
             });
         });
 
-        describe("T2. When the user chooses topic 52", function() {
+        describe("T2.a When the user chooses topic 52 (1. Coffee)", function() {
             it("should list first page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_start')
@@ -75,7 +75,7 @@ describe("app", function() {
             });
         });
 
-        describe("T3. When the user chooses topic 52 and then 3. More", function() {
+        describe("T2.b When the user chooses topic 52 and then 3. More", function() {
             it("should list second page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_start')
@@ -85,7 +85,7 @@ describe("app", function() {
                         reply: [
                             'Please choose a question:',
                             '1. What happens if the FAQ answer is really long?',
-                            '2. What happens if I realise the amount of coffee I\'ve ordered doesn\'t suit?',
+                            '2. More',
                             '3. Back'
                         ].join('\n')
                     })
@@ -93,7 +93,24 @@ describe("app", function() {
             });
         });
 
-        describe("T4. When the user chooses question 635", function() {
+        describe("T2.c When the user chooses topic 52 and then 3. More, then 2. More", function() {
+            it("should list third page of questions in topic 52", function() {
+                return tester
+                    .setup.user.state('states_start')
+                    .inputs('1', '3', '2')
+                    .check.interaction({
+                        state: 'states_questions',
+                        reply: [
+                            'Please choose a question:',
+                            '1. What happens if I realise the amount of coffee I\'ve ordered doesn\'t suit?',
+                            '2. Back'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("T3. When the user chooses question 635", function() {
             it("should show answer to question 635", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -112,7 +129,7 @@ describe("app", function() {
         });
 
         // test long faq answer splitting
-        describe("T5. When the user chooses question 999", function() {
+        describe("T4.a When the user chooses question 999", function() {
             it("should show the first part of the answer of 999", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -130,7 +147,7 @@ describe("app", function() {
             });
         });
 
-        describe("T6. When the user chooses question 999 and then 1. More", function() {
+        describe("T4.b When the user chooses question 999 and then 1. More", function() {
             it("should show the second part of the answer to 999", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -149,7 +166,7 @@ describe("app", function() {
             });
         });
 
-        describe("T7. When the user chooses question 999 and then 1. More twice", function() {
+        describe("T4.c When the user chooses question 999 and then 1. More twice", function() {
             it("should show the third part of the answer to 999", function() {
                 return tester
                     .setup.user.state('states_questions')
@@ -166,7 +183,7 @@ describe("app", function() {
             });
         });
 
-        describe("T8. When the user chooses to Send by SMS", function() {
+        describe("T5. When the user chooses to Send by SMS", function() {
             it("should thank the user, send sms, and exit", function() {
                 return tester
                     .setup.user.state('states_questions')

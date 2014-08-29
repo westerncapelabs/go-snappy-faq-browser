@@ -1,5 +1,42 @@
 module.exports = function () {
     return [
+        // FAQ RESPONSE
+        {
+            'request': {
+                'method': 'GET',
+                'headers': {
+                    'Authorization': ['Basic ' + new Buffer('test:test'.toString('base64'))],
+                    'Content-Type': ['application/json']
+                },
+                'url': 'https://app.besnappy.com/api/v1/account/1/faqs'
+            },
+            'response': {
+                'code': '200',
+                'data': [{
+                    "id": 1,
+                    "account_id": 1,
+                    "title": "English",
+                    "url": "english",
+                    "custom_theme": null,
+                    "culture": "en",
+                    "navigation": null,
+                    "created_at": "2014-08-29 12:23:05",
+                    "updated_at": "2014-08-29 12:23:05",
+                    "order": 0
+                }, {
+                    "id": 2,
+                    "account_id": 1,
+                    "title": "French",
+                    "url": "french",
+                    "custom_theme": null,
+                    "culture": "en",
+                    "navigation": null,
+                    "created_at": "2014-08-29 12:23:05",
+                    "updated_at": "2014-08-29 12:23:05",
+                    "order": 0
+                }]
+            }
+        },
         // TOPIC RESPONSE
         {
             'request': {

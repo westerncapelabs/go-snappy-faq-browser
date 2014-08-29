@@ -165,9 +165,12 @@ go.app = function() {
                     if(typeof response.data.error !== 'undefined') {
                         return error;
                     } else {
-                        return response.data.map(function (d) {
-                            return new Choice(d.id, d.title);
-                        });
+                        return _.sortBy(response.data, function (d) {
+                                return parseInt(d.order, 10);
+                            })
+                            .map(function (d) {
+                                return new Choice(d.id, d.title);
+                            });
                     }
                 })
                 .then(function (choices) {
@@ -194,9 +197,12 @@ go.app = function() {
                         // TODO Throw proper error
                         return error;
                     } else {
-                        return response.data.map(function(d) {
-                            return new Choice(d.id, d.topic);
-                        });
+                        return _.sortBy(response.data, function (d) {
+                                return parseInt(d.order, 10);
+                            })
+                            .map(function(d) {
+                                return new Choice(d.id, d.topic);
+                            });
                     }
                 })
                 .then(function(choices) {
@@ -223,9 +229,12 @@ go.app = function() {
                         // TODO Throw proper error
                         return error;
                     } else {
-                        var choices = response.data.map(function(d) {
-                            return new Choice(d.id, d.question);
-                        });
+                        var choices = _.sortBy(response.data, function (d) {
+                                return parseInt(d.pivot.order, 10);
+                            })
+                            .map(function(d) {
+                                return new Choice(d.id, d.question);
+                            });
 
                         return new PaginatedChoiceState(name, {
                             question: $('Please choose a question:'),

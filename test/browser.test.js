@@ -92,11 +92,11 @@ describe("app", function() {
                         reply: [
                             'Welcome to FAQ Browser. Choose topic:',
                             '1. Coffee',
-                            '2. delivery',
-                            '3. Payment',
+                            '2. Subscriptions',
+                            '3. Refund',
                             '4. PowerBar',
-                            '5. Refund',
-                            '6. Subscriptions'
+                            '5. Payment',
+                            '6. delivery'
                         ].join('\n')
                     })
                     .run();
@@ -116,8 +116,8 @@ describe("app", function() {
                         state: 'states_questions',
                         reply: [
                             'Please choose a question:',
-                            '1. Can I order more than one box at a time?',
-                            '2. What happens if I fall in love with one particular coffee?',
+                            '1. What happens if I fall in love with one particular coffee?',
+                            '2. Can I order more than one box at a time?',
                             '3. More'
                         ].join('\n')
                     })
@@ -177,7 +177,7 @@ describe("app", function() {
                         }
                     })
                     .setup.user.answers({'states_topics': '52'})
-                    .input('1')
+                    .input('2')
                     .check.interaction({
                         state: 'states_answers',
                         reply: [

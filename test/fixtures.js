@@ -65,6 +65,7 @@ module.exports = function () {
         },
         // QA RESPONSE
         {
+            'repeatable': true,
             'request': {
                 'method': 'GET',
                 'headers': {
@@ -139,7 +140,7 @@ module.exports = function () {
                         "is_paid": true,
                         "is_trial": false
                     }
-                }, 
+                },
                 {
                     "id": "999",
                     "account_id": "50",
@@ -273,7 +274,7 @@ module.exports = function () {
                         "is_paid": true,
                         "is_trial": false
                     }
-                }, 
+                },
                 {
                     "id": "999",
                     "account_id": "50",

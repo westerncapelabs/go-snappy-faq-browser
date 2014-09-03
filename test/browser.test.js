@@ -59,11 +59,7 @@ describe("app", function() {
         describe('When the user returns after completing a session', function () {
             it('should *not* send them the previous SMS again', function () {
                 return tester
-                    .setup.user.state('states_end', {
-                        creator_opts: {
-                            answer: 'foo'
-                        }
-                    })
+                    .setup.user.state('states_end')
                     .start()
                     .check.interaction({
                         state: 'states_faqs',
@@ -79,6 +75,30 @@ describe("app", function() {
                         });
                         assert.equal(smses.length, 0, 'It should not send the SMS!');
                     })
+                    .run();
+            });
+
+            it('should use a delegator state for sending the SMS', function () {
+                return tester
+                    .setup.user.state('states_send_sms', {
+                        creator_opts: {
+                            answer: 'foo'
+                        }
+                    })
+                    .input('hi')
+                    .check.interaction({
+                        state: 'states_end',
+                        reply: ('Thank you. Your SMS will be delivered shortly.')
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length, 1);
+                        assert.equal(sms.content, 'foo');
+                    })
+                    .check.reply.ends_session()
                     .run();
             });
         });

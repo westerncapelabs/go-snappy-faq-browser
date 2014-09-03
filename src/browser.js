@@ -137,12 +137,14 @@ go.app = function() {
                 back: $('Back'),
                 exit: $('Send to me by SMS'),
                 next: function() {
-                    return {
-                        name: 'states_end',
-                        creator_opts: {
-                            answer: opts.answer
-                        }
-                    };
+                    return self.im
+                        .outbound.send_to_user({
+                            endpoint: 'sms',
+                            content: opts.answer
+                        })
+                        .then(function () {
+                            return 'states_end';
+                        });
                 }
             });
         });
@@ -151,17 +153,7 @@ go.app = function() {
         self.states.add('states_end', function(name, opts) {
             return new EndState(name, {
                 text: $('Thank you. Your SMS will be delivered shortly.'),
-
-                next: 'states_start',
-
-                events: {
-                    'state:enter': function() {
-                        return self.im.outbound.send_to_user({
-                            endpoint: 'sms',
-                            content: opts.answer
-                        });
-                    }
-                }
+                next: 'states_start'
             });
         });
 

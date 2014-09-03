@@ -266,7 +266,7 @@ go.app = function() {
                 exit: $('Send to me by SMS'),
                 next: function() {
                     return {
-                        name: 'states_end',
+                        name: 'states_send_sms',
                         creator_opts: {
                             answer: opts.answer
                         }
@@ -275,21 +275,22 @@ go.app = function() {
             });
         });
 
+        self.states.add('states_send_sms', function (name, opts) {
+            return self.im
+                .outbound.send_to_user({
+                    endpoint: 'sms',
+                    content: opts.answer
+                })
+                .then(function () {
+                    return self.states.create('states_end');
+                });
+        });
+
         // End
         self.states.add('states_end', function(name, opts) {
             return new EndState(name, {
                 text: $('Thank you. Your SMS will be delivered shortly.'),
-
-                next: 'states_start',
-
-                events: {
-                    'state:enter': function() {
-                        return self.im.outbound.send_to_user({
-                            endpoint: 'sms',
-                            content: opts.answer
-                        });
-                    }
-                }
+                next: 'states_start'
             });
         });
 

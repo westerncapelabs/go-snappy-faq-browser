@@ -55,6 +55,33 @@ describe("app", function() {
                     .run();
             });
         });
+
+        describe('When the user returns after completing a session', function () {
+            it('should *not* send them the previous SMS again', function () {
+                return tester
+                    .setup.user.state('states_end', {
+                        creator_opts: {
+                            answer: 'foo'
+                        }
+                    })
+                    .start()
+                    .check.interaction({
+                        state: 'states_faqs',
+                        reply: [
+                            'Welcome to FAQ Browser. Choose FAQ:',
+                            '1. English',
+                            '2. French'
+                        ].join('\n')
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        assert.equal(smses.length, 0, 'It should not send the SMS!');
+                    })
+                    .run();
+            });
+        });
     });
 
     describe("for browsing FAQ topics", function() {

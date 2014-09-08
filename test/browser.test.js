@@ -372,6 +372,22 @@ describe("app", function() {
                     .check.reply.ends_session()
                     .run();
             });
+
+            it("should fire sent via sms metric", function() {
+                return tester
+                    .setup.user.state('states_questions', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.answers({'states_topics': '52'})
+                    .inputs('3', '1', '2')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.deepEqual(metrics['test.faq_sent_via_sms'].values, [1]);
+                    })
+                    .run();
+            });
         });
     });
 });

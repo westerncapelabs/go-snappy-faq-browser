@@ -123,13 +123,16 @@ go.app = function() {
                                 var question_id = choice.value;
                                 var index = _.findIndex(response.data, { 'id': question_id});
                                 var answer = response.data[index].answer.trim();
-
-                                return {
-                                    name: 'states_answers',
-                                    creator_opts: {
-                                        answer: answer
-                                    }
-                                };
+                                return self.im.metrics.fire
+                                    .inc([self.env, 'faq_view_question'].join('.'), 1)
+                                    .then(function() {
+                                        return {
+                                            name: 'states_answers',
+                                            creator_opts: {
+                                                answer: answer
+                                            }
+                                        };
+                                    });
                             }
                         });
                     }

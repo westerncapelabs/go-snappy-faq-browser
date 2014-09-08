@@ -15,6 +15,8 @@ describe("app", function() {
         tester = new AppTester(app);
     });
 
+    // This first section tests functinoality when multiple FAQs can be browsed.
+    // This is not used in some projects (like MomConnnect)
     describe("for browsing FAQ", function () {
         beforeEach(function () {
             tester
@@ -79,33 +81,12 @@ describe("app", function() {
                     })
                     .run();
             });
-
-            it('should use a delegator state for sending the SMS', function () {
-                return tester
-                    .setup.user.state('states_send_sms', {
-                        creator_opts: {
-                            answer: 'foo'
-                        }
-                    })
-                    .input('hi')
-                    .check.interaction({
-                        state: 'states_end',
-                        reply: ('Thank you. Your SMS will be delivered shortly.')
-                    })
-                    .check(function(api) {
-                        var smses = _.where(api.outbound.store, {
-                            endpoint: 'sms'
-                        });
-                        var sms = smses[0];
-                        assert.equal(smses.length, 1);
-                        assert.equal(sms.content, 'foo');
-                    })
-                    .check.reply.ends_session()
-                    .run();
-            });
         });
     });
 
+    // This section tests functionality from the point of selecting topics
+    // Move the 'When the user returns...' test above into this section when selecting
+    //     FAQ is not used.
     describe("for browsing FAQ topics", function() {
 
         beforeEach(function() {
@@ -126,6 +107,9 @@ describe("app", function() {
                         "account_id": "1",
                         "default_faq": "1"
                     }
+                })
+                .setup(function(api) {
+                    api.metrics.stores = {'test_metric_store': {}};
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
@@ -368,6 +352,30 @@ describe("app", function() {
                             "should be split over at least 2 screens just because we want to " +
                             "test properly. Let\'s see."
                         );
+                    })
+                    .check.reply.ends_session()
+                    .run();
+            });
+
+            it('should use a delegator state for sending the SMS', function () {
+                return tester
+                    .setup.user.state('states_send_sms', {
+                        creator_opts: {
+                            answer: 'foo'
+                        }
+                    })
+                    .input('hi')
+                    .check.interaction({
+                        state: 'states_end',
+                        reply: ('Thank you. Your SMS will be delivered shortly.')
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length, 1);
+                        assert.equal(sms.content, 'foo');
                     })
                     .check.reply.ends_session()
                     .run();

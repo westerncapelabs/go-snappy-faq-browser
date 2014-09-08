@@ -141,6 +141,7 @@ go.app = function() {
         var $ = self.$;
 
         self.init = function() {
+            self.env = self.im.config.env;
             return self.im.contacts
                 .for_user()
                 .then(function(user_contact) {
@@ -174,17 +175,23 @@ go.app = function() {
                     }
                 })
                 .then(function (choices) {
+                    console.log(choices);
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose FAQ:'),
                         choices: choices,
                         options_per_page: 8,
                         next: function (choice) {
-                            return {
-                                name: 'states_topics',
-                                creator_opts: {
-                                    faq_id: choice.value
-                                }
-                            };
+                            console.log(choice);
+                            return self.im.metrics.fire
+                                .inc([self.env, 'faq_view_topic', choice.value].join('.'), 1)
+                                .then(function() {
+                                    return {
+                                        name: 'states_topics',
+                                        creator_opts: {
+                                            faq_id: choice.value
+                                        }
+                                    };
+                                });
                         }
                     });
                 });

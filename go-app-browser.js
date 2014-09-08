@@ -291,6 +291,9 @@ go.app = function() {
                     endpoint: 'sms',
                     content: opts.answer
                 })
+                .then(function() {
+                    return self.im.metrics.fire.inc([self.env, 'faq_sent_via_sms'].join('.'), 1);
+                })
                 .then(function () {
                     return self.states.create('states_end');
                 });

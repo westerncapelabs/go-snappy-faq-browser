@@ -175,23 +175,17 @@ go.app = function() {
                     }
                 })
                 .then(function (choices) {
-                    console.log(choices);
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose FAQ:'),
                         choices: choices,
                         options_per_page: 8,
                         next: function (choice) {
-                            console.log(choice);
-                            return self.im.metrics.fire
-                                .inc([self.env, 'faq_view_topic', choice.value].join('.'), 1)
-                                .then(function() {
-                                    return {
-                                        name: 'states_topics',
-                                        creator_opts: {
-                                            faq_id: choice.value
-                                        }
-                                    };
-                                });
+                            return {
+                                name: 'states_topics',
+                                creator_opts: {
+                                    faq_id: choice.value
+                                }
+                            };
                         }
                     });
                 });
@@ -217,11 +211,17 @@ go.app = function() {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
                         options_per_page: 8,
-                        next: {
-                            name: 'states_questions',
-                            creator_opts: {
-                                faq_id: opts.faq_id
-                            }
+                        next: function(choice) {
+                            return self.im.metrics.fire
+                                .inc([self.env, 'faq_view_topic', choice.value].join('.'), 1)
+                                .then(function() {
+                                    return {
+                                        name: 'states_questions',
+                                        creator_opts: {
+                                            faq_id: opts.faq_id
+                                        }
+                                    };
+                                });
                         }
                     });
                 });

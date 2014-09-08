@@ -217,15 +217,18 @@ describe("app", function() {
             });
         });
 
-        describe("T2.d When the user chooses topic 52 (1. Coffee)", function() {
+        describe("T2.d When the user chooses topic 52 (Coffee)", function() {
             it("should increment topic Coffee metric", function() {
                 return tester
-                    .setup.user.state('states_faqs')
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
                     .input('1')
                     .check(function(api) {
                         var metrics = api.metrics.stores.test_metric_store;
-                        console.log(metrics);
-                        assert.deepEqual(metrics['test.faq_view_topic.1'].values, [1]);
+                        assert.deepEqual(metrics['test.faq_view_topic.52'].values, [1]);
                     })
                     .run();
             });

@@ -37,6 +37,9 @@ describe("app", function() {
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
+                })
+                .setup(function(api) {
+                    api.metrics.stores = {'test_metric_store': {}};
                 });
         });
 
@@ -60,7 +63,6 @@ describe("app", function() {
             it('should *not* send them the previous SMS again', function () {
                 return tester
                     .setup.user.state('states_end')
-                    .start()
                     .check.interaction({
                         state: 'states_faqs',
                         reply: [
@@ -210,6 +212,20 @@ describe("app", function() {
                             '1. What happens if I realise the amount of coffee I\'ve ordered doesn\'t suit?',
                             '2. Back'
                         ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("T2.d When the user chooses topic 52 (1. Coffee)", function() {
+            it("should increment topic Coffee metric", function() {
+                return tester
+                    .setup.user.state('states_faqs')
+                    .input('1')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        console.log(metrics);
+                        assert.deepEqual(metrics['test.faq_view_topic.1'].values, [1]);
                     })
                     .run();
             });

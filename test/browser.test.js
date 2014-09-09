@@ -15,6 +15,8 @@ describe("app", function() {
         tester = new AppTester(app);
     });
 
+    // This first section tests functinoality when multiple FAQs can be browsed.
+    // This is not used in some projects (like MomConnnect)
     describe("for browsing FAQ", function () {
         beforeEach(function () {
             tester
@@ -37,6 +39,9 @@ describe("app", function() {
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
+                })
+                .setup(function(api) {
+                    api.metrics.stores = {'test_metric_store': {}};
                 });
         });
 
@@ -60,7 +65,6 @@ describe("app", function() {
             it('should *not* send them the previous SMS again', function () {
                 return tester
                     .setup.user.state('states_end')
-                    .start()
                     .check.interaction({
                         state: 'states_faqs',
                         reply: [
@@ -78,32 +82,21 @@ describe("app", function() {
                     .run();
             });
 
-            it('should use a delegator state for sending the SMS', function () {
+            it('should *not* fire another sms send metric', function () {
                 return tester
-                    .setup.user.state('states_send_sms', {
-                        creator_opts: {
-                            answer: 'foo'
-                        }
-                    })
-                    .input('hi')
-                    .check.interaction({
-                        state: 'states_end',
-                        reply: ('Thank you. Your SMS will be delivered shortly.')
-                    })
+                    .setup.user.state('states_end')
                     .check(function(api) {
-                        var smses = _.where(api.outbound.store, {
-                            endpoint: 'sms'
-                        });
-                        var sms = smses[0];
-                        assert.equal(smses.length, 1);
-                        assert.equal(sms.content, 'foo');
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.equal(metrics['test.faq_sent_via_sms'], undefined);
                     })
-                    .check.reply.ends_session()
                     .run();
             });
         });
     });
 
+    // This section tests functionality from the point of selecting topics
+    // Move the 'When the user returns...' test above into this section when selecting
+    //     FAQ is not used.
     describe("for browsing FAQ topics", function() {
 
         beforeEach(function() {
@@ -124,6 +117,9 @@ describe("app", function() {
                         "account_id": "1",
                         "default_faq": "1"
                     }
+                })
+                .setup(function(api) {
+                    api.metrics.stores = {'test_metric_store': {}};
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
@@ -215,7 +211,24 @@ describe("app", function() {
             });
         });
 
-        describe("T3. When the user chooses question 635", function() {
+        describe("T2.d When the user chooses topic 52 (Coffee)", function() {
+            it("should increment topic coffee metric", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .input('1')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.deepEqual(metrics['test.faq_view_topic.52'].values, [1]);
+                    })
+                    .run();
+            });
+        });
+
+        describe("T3.a When the user chooses question 635", function() {
             it("should show answer to question 635", function() {
                 return tester
                     .setup.user.state('states_questions', {
@@ -232,6 +245,51 @@ describe("app", function() {
                             '1. More',
                             '2. Send to me by SMS'
                         ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("T3.b When the user views a question", function() {
+            it("should increment faq view metric", function() {
+                return tester
+                    .setup.user.state('states_questions', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.answers({'states_topics': '52'})
+                    .input('2')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.deepEqual(metrics['test.faq_view_question'].values, [1]);
+                    })
+                    .run();
+            });
+        });
+
+        describe("T3.c When the user times out and dials back in", function() {
+            it("should not fire a metric increment", function() {
+                return tester
+                    .setup.user.state('states_questions', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.answers({'states_topics': '52'})
+                    .input.session_event('new')
+                    .check.interaction({
+                        state: 'states_questions',
+                        reply: [
+                            'Please choose a question:',
+                            '1. What happens if I fall in love with one particular coffee?',
+                            '2. Can I order more than one box at a time?',
+                            '3. More'
+                        ].join('\n')
+                    })
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.equal(metrics['test.faq_view_question'], undefined);
                     })
                     .run();
             });
@@ -333,6 +391,46 @@ describe("app", function() {
                         );
                     })
                     .check.reply.ends_session()
+                    .run();
+            });
+
+            it('should use a delegator state for sending the SMS', function () {
+                return tester
+                    .setup.user.state('states_send_sms', {
+                        creator_opts: {
+                            answer: 'foo'
+                        }
+                    })
+                    .input('hi')
+                    .check.interaction({
+                        state: 'states_end',
+                        reply: ('Thank you. Your SMS will be delivered shortly.')
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length, 1);
+                        assert.equal(sms.content, 'foo');
+                    })
+                    .check.reply.ends_session()
+                    .run();
+            });
+
+            it("should fire sent via sms metric", function() {
+                return tester
+                    .setup.user.state('states_questions', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.answers({'states_topics': '52'})
+                    .inputs('3', '1', '2')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.deepEqual(metrics['test.faq_sent_via_sms'].values, [1]);
+                    })
                     .run();
             });
         });

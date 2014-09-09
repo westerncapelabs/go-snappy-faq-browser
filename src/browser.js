@@ -13,6 +13,7 @@ go.app = function() {
         var $ = self.$;
 
         self.init = function() {
+            self.env = self.im.config.env;
             return self.im.contacts
                 .for_user()
                 .then(function(user_contact) {
@@ -82,11 +83,21 @@ go.app = function() {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
                         options_per_page: 8,
-                        next: {
-                            name: 'states_questions',
-                            creator_opts: {
-                                faq_id: opts.faq_id
-                            }
+                        next: function(choice) {
+                            return self.im.metrics.fire
+                                .inc([
+                                        self.env,
+                                        'faq_view_topic',
+                                        choice.value
+                                    ].join('.'), 1)
+                                .then(function() {
+                                    return {
+                                        name: 'states_questions',
+                                        creator_opts: {
+                                            faq_id: opts.faq_id
+                                        }
+                                    };
+                                });
                         }
                     });
                 });
@@ -116,13 +127,16 @@ go.app = function() {
                                 var question_id = choice.value;
                                 var index = _.findIndex(response.data, { 'id': question_id});
                                 var answer = response.data[index].answer.trim();
-
-                                return {
-                                    name: 'states_answers',
-                                    creator_opts: {
-                                        answer: answer
-                                    }
-                                };
+                                return self.im.metrics.fire
+                                    .inc([self.env, 'faq_view_question'].join('.'), 1)
+                                    .then(function() {
+                                        return {
+                                            name: 'states_answers',
+                                            creator_opts: {
+                                                answer: answer
+                                            }
+                                        };
+                                    });
                             }
                         });
                     }
@@ -152,6 +166,9 @@ go.app = function() {
                 .outbound.send_to_user({
                     endpoint: 'sms',
                     content: opts.answer
+                })
+                .then(function() {
+                    return self.im.metrics.fire.inc([self.env, 'faq_sent_via_sms'].join('.'), 1);
                 })
                 .then(function () {
                     return self.states.create('states_end');

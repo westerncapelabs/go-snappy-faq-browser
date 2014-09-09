@@ -222,7 +222,7 @@ describe("app", function() {
                     .input('1')
                     .check(function(api) {
                         var metrics = api.metrics.stores.test_metric_store;
-                        assert.deepEqual(metrics['test.faq_view_topic.coffee'].values, [1]);
+                        assert.deepEqual(metrics['test.faq_view_topic.52'].values, [1]);
                     })
                     .run();
             });

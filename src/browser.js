@@ -88,7 +88,7 @@ go.app = function() {
                                 .inc([
                                         self.env,
                                         'faq_view_topic',
-                                        choice.label.toLowerCase()
+                                        choice.value
                                     ].join('.'), 1)
                                 .then(function() {
                                     return {

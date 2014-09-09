@@ -213,7 +213,7 @@ go.app = function() {
                         options_per_page: 8,
                         next: function(choice) {
                             return self.im.metrics.fire
-                                .inc([self.env, 'faq_view_topic', choice.value].join('.'), 1)
+                                .inc([self.env, 'faq_view_topic', choice.label.toLowerCase()].join('.'), 1)
                                 .then(function() {
                                     return {
                                         name: 'states_questions',

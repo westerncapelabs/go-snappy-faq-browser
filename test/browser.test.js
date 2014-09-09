@@ -81,6 +81,16 @@ describe("app", function() {
                     })
                     .run();
             });
+
+            it('should *not* fire another sms send metric', function () {
+                return tester
+                    .setup.user.state('states_end')
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.equal(metrics['test.faq_sent_via_sms'], undefined);
+                    })
+                    .run();
+            });
         });
     });
 
@@ -253,6 +263,33 @@ describe("app", function() {
                     .check(function(api) {
                         var metrics = api.metrics.stores.test_metric_store;
                         assert.deepEqual(metrics['test.faq_view_question'].values, [1]);
+                    })
+                    .run();
+            });
+        });
+
+        describe("T3.c When the user times out and dials back in", function() {
+            it("should not fire a metric increment", function() {
+                return tester
+                    .setup.user.state('states_questions', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.answers({'states_topics': '52'})
+                    .input.session_event('new')
+                    .check.interaction({
+                        state: 'states_questions',
+                        reply: [
+                            'Please choose a question:',
+                            '1. What happens if I fall in love with one particular coffee?',
+                            '2. Can I order more than one box at a time?',
+                            '3. More'
+                        ].join('\n')
+                    })
+                    .check(function(api) {
+                        var metrics = api.metrics.stores.test_metric_store;
+                        assert.equal(metrics['test.faq_view_question'], undefined);
                     })
                     .run();
             });

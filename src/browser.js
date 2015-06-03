@@ -79,6 +79,7 @@ go.app = function() {
                     }
                 })
                 .then(function(choices) {
+                    choices.unshift(new Choice('search', 'Search FAQ'));
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,

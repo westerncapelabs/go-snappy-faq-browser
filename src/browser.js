@@ -121,7 +121,7 @@ go.app = function() {
                 question: $('What do you want to know about?'),
                 next: function(query) {
                     return go.utils
-                        .search_faqs(self.im, query)
+                        .search_faqs(self.im, query, self.im.user.lang)
                         .then(function(faq_response) {
                             return {
                                 name: 'states_search_responses',
@@ -172,7 +172,7 @@ go.app = function() {
                 text: opts.answer,
                 more: $('More'),
                 back: $('Back'),
-                exit: $('Show another'),
+                exit: $('Exit'),
                 next: function() {
                     return {
                         name: 'states_search_responses',

@@ -537,7 +537,7 @@ module.exports = function () {
                         {
                             "id": 1001,
                             "account_id": 1,
-                            "question": "How much coffee is too much?",
+                            "question": "[en]How much coffee is too much?",
                             "answer": "If you're Dutch you're probably drinking too much coffee.",
                             "created_at": "2014-08-13 21:51:34",
                             "updated_at": "2014-08-13 21:51:34",
@@ -547,12 +547,32 @@ module.exports = function () {
                         {
                             "id": 1002,
                             "account_id": 1,
-                            "question": "How can I overcome my coffee addiction?",
+                            "question": "[en]How can I overcome my coffee addiction?",
                             "answer": "Stop it!",
                             "created_at": "2014-08-13 21:51:34",
                             "updated_at": "2014-08-13 21:51:34",
                             "active": 1,
                             "parsed_answer": "<p>Stop it!</p>\n"
+                        },
+                        {
+                            "id": 1003,
+                            "account_id": 1,
+                            "question": "[fr]Coffee bon wi?",
+                            "answer": "Omelette du fromage!",
+                            "created_at": "2014-08-13 21:51:34",
+                            "updated_at": "2014-08-13 21:51:34",
+                            "active": 1,
+                            "parsed_answer": "<p>Omelette du fromage</p>\n"
+                        },
+                        {
+                            "id": 1004,
+                            "account_id": 1,
+                            "question": "Is coffee bad for you?",
+                            "answer": "For your teeth, yes!",
+                            "created_at": "2014-08-13 21:51:34",
+                            "updated_at": "2014-08-13 21:51:34",
+                            "active": 1,
+                            "parsed_answer": "<p>For your teeth, yes!</p>\n"
                         }
                     ]
                 }

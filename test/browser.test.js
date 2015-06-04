@@ -163,7 +163,7 @@ describe("app", function() {
                     .run();
             });
 
-            it("should show a list of questions matching their query", function() {
+            it("should show a list of questions matching their query (lang null)", function() {
                 return tester
                     .setup.user.state('states_topics', {
                         creator_opts: {
@@ -177,7 +177,50 @@ describe("app", function() {
                             'Select:',
                             '1. Restart',
                             '2. How much coffee is too much?',
-                            '3. How can I overcome my coffee addiction?'
+                            '3. How can I overcome my coffee addiction?',
+                            '4. Is coffee bad for you?'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show a list of questions matching their query (lang en)", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.lang('en')
+                    .inputs('1', 'toomuchcoffee')
+                    .check.interaction({
+                        state: 'states_search_responses',
+                        reply: [
+                            'Select:',
+                            '1. Restart',
+                            '2. How much coffee is too much?',
+                            '3. How can I overcome my coffee addiction?',
+                            '4. Is coffee bad for you?'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show a list of questions matching their query (lang fr)", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.lang('fr')
+                    .inputs('1', 'toomuchcoffee')
+                    .check.interaction({
+                        state: 'states_search_responses',
+                        reply: [
+                            'Select:',
+                            '1. Restart',
+                            '2. Coffee bon wi?'
                         ].join('\n')
                     })
                     .run();
@@ -195,13 +238,32 @@ describe("app", function() {
                         state: 'states_search_answers',
                         reply: [
                             "If you're Dutch you're probably drinking too much coffee.",
-                            "1. Show another"
+                            "1. Exit"
                         ].join('\n')
                     })
                     .run();
             });
 
-            it("should show list of questions again when selecting Show another", function() {
+            it("should show french answer if that is their lang", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .setup.user.lang('fr')
+                    .inputs('1', 'toomuchcoffee', '2')
+                    .check.interaction({
+                        state: 'states_search_answers',
+                        reply: [
+                            "Omelette du fromage!",
+                            "1. Exit"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show list of questions again when selecting Exit", function() {
                 return tester
                     .setup.user.state('states_topics', {
                         creator_opts: {
@@ -215,7 +277,8 @@ describe("app", function() {
                             'Select:',
                             '1. Restart',
                             '2. How much coffee is too much?',
-                            '3. How can I overcome my coffee addiction?'
+                            '3. How can I overcome my coffee addiction?',
+                            '4. Is coffee bad for you?'
                         ].join('\n')
                     })
                     .run();

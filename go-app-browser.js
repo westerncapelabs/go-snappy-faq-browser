@@ -129,7 +129,8 @@ go.utils = {
         });
     },
 
-    search_faqs: function(im, query) {
+    search_faqs: function(im, query, user_lang) {
+        var faq_lang = user_lang || 'en';  // default to english
         var http = new JsonApi(im, {
             auth: {
                 username: im.config.snappy.username,
@@ -153,7 +154,11 @@ go.utils = {
             .then(function(result) {
                 var qna = {};
                 result.data.forEach(function(response) {
-                    qna[response.question] = response.answer;
+                    if (response.question.substr(0,4) === ('['+faq_lang+']')) {
+                        qna[response.question.substr(4)] = response.answer;
+                    } else if ((response.question.substr(0,1) !== '[') && (faq_lang === 'en')) {
+                        qna[response.question] = response.answer;
+                    }
                 });
                 return qna;
             });
@@ -292,7 +297,7 @@ go.app = function() {
                 question: $('What do you want to know about?'),
                 next: function(query) {
                     return go.utils
-                        .search_faqs(self.im, query)
+                        .search_faqs(self.im, query, self.im.user.lang)
                         .then(function(faq_response) {
                             return {
                                 name: 'states_search_responses',
@@ -343,7 +348,7 @@ go.app = function() {
                 text: opts.answer,
                 more: $('More'),
                 back: $('Back'),
-                exit: $('Show another'),
+                exit: $('Exit'),
                 next: function() {
                     return {
                         name: 'states_search_responses',

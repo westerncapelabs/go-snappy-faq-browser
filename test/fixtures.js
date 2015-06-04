@@ -39,6 +39,7 @@ module.exports = function () {
         },
         // TOPIC RESPONSE
         {
+            'repeatable': true,
             'request': {
                 'method': 'GET',
                 'headers': {
@@ -523,7 +524,7 @@ module.exports = function () {
                     'Authorization': ['Basic ' + new Buffer('test:test').toString('base64')],
                     'Content-Type': ['application/json']
                 },
-                'url': 'https://app.besnappy.com/api/v1/account/1/faqs/search?query=shipping&page=1'
+                'url': 'https://app.besnappy.com/api/v1/account/1/faqs/search?query=toomuchcoffee&page=1'
             },
             'responses': [
                 {

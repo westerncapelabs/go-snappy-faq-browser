@@ -7,6 +7,7 @@ go.app = function() {
     var EndState = vumigo.states.EndState;
     var PaginatedState = vumigo.states.PaginatedState;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
+    var FreeText = vumigo.states.FreeText;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
@@ -79,29 +80,109 @@ go.app = function() {
                     }
                 })
                 .then(function(choices) {
-                    choices.unshift(new Choice('search', 'Search FAQ'));
+                    choices.unshift(new Choice('search', 'Search FAQs'));
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
                         options_per_page: 8,
                         next: function(choice) {
+                            var ch = choice.value;
                             return self.im.metrics.fire
                                 .inc([
                                         self.env,
                                         'faq_view_topic',
                                         choice.value
                                     ].join('.'), 1)
-                                .then(function() {
-                                    return {
-                                        name: 'states_questions',
-                                        creator_opts: {
-                                            faq_id: opts.faq_id
-                                        }
-                                    };
+                                .then(function(choice) {
+                                    if (ch === 'search') {
+                                        return {
+                                            name: 'states_search_query',
+                                            creator_opts: {
+                                                faq_id: opts.faq_id
+                                            }
+                                        };
+                                    } else {
+                                        return {
+                                            name: 'states_questions',
+                                            creator_opts: {
+                                                faq_id: opts.faq_id
+                                            }
+                                        };
+                                    }
                                 });
                         }
                     });
                 });
+        });
+
+        // Ask what user wants to search for
+        self.states.add('states_search_query', function(name, opts) {
+            return new FreeText(name, {
+                question: $('What do you want to know about?'),
+                next: function(query) {
+                    return go.utils
+                        .search_faqs(self.im, query)
+                        .then(function(faq_response) {
+                            return {
+                                name: 'states_search_responses',
+                                creator_opts: {
+                                    faq_response: faq_response,
+                                    faq_id: opts.faq_id
+                                }
+                            };
+                        });
+                }
+            });
+        });
+
+        // Show FAQ search results
+        self.states.add('states_search_responses', function(name, opts) {
+            return new PaginatedChoiceState(name, {
+                question: $("Select:"),
+                characters_per_page: 160,
+                back: $('Back'),
+                more: $('Next'),
+                options_per_page: null,
+                choices: go.utils.make_search_choices(opts.faq_response, $),
+                next: function(choice) {
+                    if (choice.value === 'restart') {
+                        return {
+                            name: 'states_topics',
+                            creator_opts: {
+                                faq_id: opts.faq_id
+                            }
+                        };
+                    } else {
+                    return {
+                            name: 'states_search_answers',
+                            creator_opts: {
+                                faq_response: opts.faq_response,
+                                faq_id: opts.faq_id,
+                                answer: opts.faq_response[choice.value],
+                            }
+                        };
+                    }
+                }
+            });
+        });
+
+        // Show selected FAQ answer
+        self.states.add('states_search_answers', function(name, opts) {
+            return new PaginatedState(name, {
+                text: opts.answer,
+                more: $('More'),
+                back: $('Back'),
+                exit: $('Show another'),
+                next: function() {
+                    return {
+                        name: 'states_search_responses',
+                        creator_opts: {
+                            faq_response: opts.faq_response,
+                            faq_id: opts.faq_id
+                        }
+                    };
+                }
+            });
         });
 
         // Show questions in selected topic

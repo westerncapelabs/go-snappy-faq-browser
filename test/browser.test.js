@@ -134,19 +134,119 @@ describe("app", function() {
                         state: 'states_topics',
                         reply: [
                             'Welcome to FAQ Browser. Choose topic:',
-                            '1. Coffee',
-                            '2. Subscriptions',
-                            '3. Refund',
-                            '4. PowerBar',
-                            '5. Payment',
-                            '6. delivery'
+                            '1. Search FAQs',
+                            '2. Coffee',
+                            '3. Subscriptions',
+                            '4. Refund',
+                            '5. PowerBar',
+                            '6. Payment',
+                            '7. delivery'
                         ].join('\n')
                     })
                     .run();
             });
         });
 
-        describe("T2.a When the user chooses topic 52 (1. Coffee)", function() {
+        describe("T2.a When the user chooses Search (1. Search FAQs)", function() {
+            it("should ask what they want to search for", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .inputs('1')
+                    .check.interaction({
+                        state: 'states_search_query',
+                        reply: 'What do you want to know about?',
+                    })
+                    .run();
+            });
+
+            it("should show a list of questions matching their query", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .inputs('1', 'toomuchcoffee')
+                    .check.interaction({
+                        state: 'states_search_responses',
+                        reply: [
+                            'Select:',
+                            '1. Restart',
+                            '2. How much coffee is too much?',
+                            '3. How can I overcome my coffee addiction?'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show answer upon selecting a question", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .inputs('1', 'toomuchcoffee', '2')
+                    .check.interaction({
+                        state: 'states_search_answers',
+                        reply: [
+                            "If you're Dutch you're probably drinking too much coffee.",
+                            "1. Show another"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show list of questions again when selecting Show another", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .inputs('1', 'toomuchcoffee', '2', '1')
+                    .check.interaction({
+                        state: 'states_search_responses',
+                        reply: [
+                            'Select:',
+                            '1. Restart',
+                            '2. How much coffee is too much?',
+                            '3. How can I overcome my coffee addiction?'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+
+            it("should show Topics again when hitting Restart", function() {
+                return tester
+                    .setup.user.state('states_topics', {
+                        creator_opts: {
+                            faq_id: 1
+                        }
+                    })
+                    .inputs('1', 'toomuchcoffee', '1')
+                    .check.interaction({
+                        state: 'states_topics',
+                        reply: [
+                            'Welcome to FAQ Browser. Choose topic:',
+                            '1. Search FAQs',
+                            '2. Coffee',
+                            '3. Subscriptions',
+                            '4. Refund',
+                            '5. PowerBar',
+                            '6. Payment',
+                            '7. delivery'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("T2.b When the user chooses topic 52 (2. Coffee)", function() {
             it("should list first page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_topics', {
@@ -154,7 +254,7 @@ describe("app", function() {
                             faq_id: 1
                         }
                     })
-                    .input('1')
+                    .input('2')
                     .check.interaction({
                         state: 'states_questions',
                         reply: [
@@ -168,7 +268,7 @@ describe("app", function() {
             });
         });
 
-        describe("T2.b When the user chooses topic 52 and then 3. More", function() {
+        describe("T2.c When the user chooses topic 52 and then 3. More", function() {
             it("should list second page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_topics', {
@@ -176,7 +276,7 @@ describe("app", function() {
                             faq_id: 1
                         }
                     })
-                    .inputs('1', '3')
+                    .inputs('2', '3')
                     .check.interaction({
                         state: 'states_questions',
                         reply: [
@@ -190,7 +290,7 @@ describe("app", function() {
             });
         });
 
-        describe("T2.c When the user chooses topic 52 and then 3. More, then 2. More", function() {
+        describe("T2.d When the user chooses topic 52 and then 3. More, then 2. More", function() {
             it("should list third page of questions in topic 52", function() {
                 return tester
                     .setup.user.state('states_topics', {
@@ -198,7 +298,7 @@ describe("app", function() {
                             faq_id: 1
                         }
                     })
-                    .inputs('1', '3', '2')
+                    .inputs('2', '3', '2')
                     .check.interaction({
                         state: 'states_questions',
                         reply: [
@@ -211,7 +311,7 @@ describe("app", function() {
             });
         });
 
-        describe("T2.d When the user chooses topic 52 (Coffee)", function() {
+        describe("T2.e When the user chooses topic 52 (Coffee)", function() {
             it("should increment topic coffee metric", function() {
                 return tester
                     .setup.user.state('states_topics', {
@@ -219,7 +319,7 @@ describe("app", function() {
                             faq_id: 1
                         }
                     })
-                    .input('1')
+                    .input('2')
                     .check(function(api) {
                         var metrics = api.metrics.stores.test_metric_store;
                         assert.deepEqual(metrics['test.faq_view_topic.52'].values, [1]);
@@ -353,7 +453,7 @@ describe("app", function() {
                     .inputs('3', '1', '1', '1')
                     .check.interaction({
                         state: 'states_answers',
-                        reply: ['to test properly. Let\'s see.',
+                        reply: ['want to test properly. Let\'s see.',
                             '1. Back',
                             '2. Send to me by SMS'
                         ].join('\n')

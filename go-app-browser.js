@@ -4,6 +4,7 @@ go;
 var _ = require('lodash');
 var vumigo = require('vumigo_v02');
 var JsonApi = vumigo.http.api.JsonApi;
+var Choice = vumigo.states.Choice;
 
 go.utils = {
     // Shared utils lib
@@ -110,19 +111,66 @@ go.utils = {
 
     get_snappy_topic_content: function(im, faq_id, topic_id) {
         var http = new JsonApi(im, {
-          auth: {
-            username: im.config.snappy.username,
-            password: 'x'
-          }
+            auth: {
+                username: im.config.snappy.username,
+                password: 'x'
+            }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
+        var snappy_topic_content_url = im.config.snappy.endpoint + 'account/' +
+                im.config.snappy.account_id + '/faqs/' + faq_id + '/topics/' +
+                topic_id + '/questions';
+
+        return http.get(snappy_topic_content_url, {
+            data: JSON.stringify(),
+            headers: {
+                'Content-Type': ['application/json']
+            },
+            ssl_method: "SSLv3"
         });
     },
+
+    search_faqs: function(im, query, user_lang) {
+        var faq_lang = user_lang || 'en';  // default to english
+        var http = new JsonApi(im, {
+            auth: {
+                username: im.config.snappy.username,
+                password: 'x'
+            }
+        });
+        var faq_search_url = im.config.snappy.endpoint + 'account/' +
+                        im.config.snappy.account_id + '/faqs/search';
+
+        return http
+            .get(faq_search_url, {
+                headers: {
+                    'Content-Type': ['application/json']
+                },
+                ssl_method: "SSLv3",
+                params: {
+                    "query": query,
+                    "page": 1
+                }
+            })
+            .then(function(result) {
+                var qna = {};
+                result.data.forEach(function(response) {
+                    if (response.question.substr(0,4) === ('['+faq_lang+']')) {
+                        qna[response.question.substr(4)] = response.answer;
+                    } else if ((response.question.substr(0,1) !== '[') && (faq_lang === 'en')) {
+                        qna[response.question] = response.answer;
+                    }
+                });
+                return qna;
+            });
+    },
+
+    make_search_choices: function(faq_response, $) {
+        var choices = [new Choice('restart', $('Restart'))];
+        Object.keys(faq_response).forEach(function(question) {
+            choices.push(new Choice(question, $(question)));
+        });
+        return choices;
+    }
 
 };
 
@@ -135,6 +183,7 @@ go.app = function() {
     var EndState = vumigo.states.EndState;
     var PaginatedState = vumigo.states.PaginatedState;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
+    var FreeText = vumigo.states.FreeText;
 
     var GoFAQBrowser = App.extend(function(self) {
         App.call(self, 'states_start');
@@ -207,28 +256,109 @@ go.app = function() {
                     }
                 })
                 .then(function(choices) {
+                    choices.unshift(new Choice('search', 'Search FAQs'));
                     return new PaginatedChoiceState(name, {
                         question: $('Welcome to FAQ Browser. Choose topic:'),
                         choices: choices,
                         options_per_page: 8,
                         next: function(choice) {
+                            var ch = choice.value;
                             return self.im.metrics.fire
                                 .inc([
                                         self.env,
                                         'faq_view_topic',
                                         choice.value
                                     ].join('.'), 1)
-                                .then(function() {
-                                    return {
-                                        name: 'states_questions',
-                                        creator_opts: {
-                                            faq_id: opts.faq_id
-                                        }
-                                    };
+                                .then(function(choice) {
+                                    if (ch === 'search') {
+                                        return {
+                                            name: 'states_search_query',
+                                            creator_opts: {
+                                                faq_id: opts.faq_id
+                                            }
+                                        };
+                                    } else {
+                                        return {
+                                            name: 'states_questions',
+                                            creator_opts: {
+                                                faq_id: opts.faq_id
+                                            }
+                                        };
+                                    }
                                 });
                         }
                     });
                 });
+        });
+
+        // Ask what user wants to search for
+        self.states.add('states_search_query', function(name, opts) {
+            return new FreeText(name, {
+                question: $('What do you want to know about?'),
+                next: function(query) {
+                    return go.utils
+                        .search_faqs(self.im, query, self.im.user.lang)
+                        .then(function(faq_response) {
+                            return {
+                                name: 'states_search_responses',
+                                creator_opts: {
+                                    faq_response: faq_response,
+                                    faq_id: opts.faq_id
+                                }
+                            };
+                        });
+                }
+            });
+        });
+
+        // Show FAQ search results
+        self.states.add('states_search_responses', function(name, opts) {
+            return new PaginatedChoiceState(name, {
+                question: $("Select:"),
+                characters_per_page: 160,
+                back: $('Back'),
+                more: $('Next'),
+                options_per_page: null,
+                choices: go.utils.make_search_choices(opts.faq_response, $),
+                next: function(choice) {
+                    if (choice.value === 'restart') {
+                        return {
+                            name: 'states_topics',
+                            creator_opts: {
+                                faq_id: opts.faq_id
+                            }
+                        };
+                    } else {
+                    return {
+                            name: 'states_search_answers',
+                            creator_opts: {
+                                faq_response: opts.faq_response,
+                                faq_id: opts.faq_id,
+                                answer: opts.faq_response[choice.value],
+                            }
+                        };
+                    }
+                }
+            });
+        });
+
+        // Show selected FAQ answer
+        self.states.add('states_search_answers', function(name, opts) {
+            return new PaginatedState(name, {
+                text: opts.answer,
+                more: $('More'),
+                back: $('Back'),
+                exit: $('Exit'),
+                next: function() {
+                    return {
+                        name: 'states_search_responses',
+                        creator_opts: {
+                            faq_response: opts.faq_response,
+                            faq_id: opts.faq_id
+                        }
+                    };
+                }
+            });
         });
 
         // Show questions in selected topic

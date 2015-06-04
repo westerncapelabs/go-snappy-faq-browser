@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var vumigo = require('vumigo_v02');
 var JsonApi = vumigo.http.api.JsonApi;
+var Choice = vumigo.states.Choice;
 
 go.utils = {
     // Shared utils lib
@@ -107,18 +108,65 @@ go.utils = {
 
     get_snappy_topic_content: function(im, faq_id, topic_id) {
         var http = new JsonApi(im, {
-          auth: {
-            username: im.config.snappy.username,
-            password: 'x'
-          }
+            auth: {
+                username: im.config.snappy.username,
+                password: 'x'
+            }
         });
-        return http.get(im.config.snappy.endpoint + 'account/'+im.config.snappy.account_id+'/faqs/'+faq_id+'/topics/'+topic_id+'/questions', {
-          data: JSON.stringify(),
-          headers: {
-            'Content-Type': ['application/json']
-          },
-          ssl_method: "SSLv3"
+        var snappy_topic_content_url = im.config.snappy.endpoint + 'account/' +
+                im.config.snappy.account_id + '/faqs/' + faq_id + '/topics/' +
+                topic_id + '/questions';
+
+        return http.get(snappy_topic_content_url, {
+            data: JSON.stringify(),
+            headers: {
+                'Content-Type': ['application/json']
+            },
+            ssl_method: "SSLv3"
         });
     },
+
+    search_faqs: function(im, query, user_lang) {
+        var faq_lang = user_lang || 'en';  // default to english
+        var http = new JsonApi(im, {
+            auth: {
+                username: im.config.snappy.username,
+                password: 'x'
+            }
+        });
+        var faq_search_url = im.config.snappy.endpoint + 'account/' +
+                        im.config.snappy.account_id + '/faqs/search';
+
+        return http
+            .get(faq_search_url, {
+                headers: {
+                    'Content-Type': ['application/json']
+                },
+                ssl_method: "SSLv3",
+                params: {
+                    "query": query,
+                    "page": 1
+                }
+            })
+            .then(function(result) {
+                var qna = {};
+                result.data.forEach(function(response) {
+                    if (response.question.substr(0,4) === ('['+faq_lang+']')) {
+                        qna[response.question.substr(4)] = response.answer;
+                    } else if ((response.question.substr(0,1) !== '[') && (faq_lang === 'en')) {
+                        qna[response.question] = response.answer;
+                    }
+                });
+                return qna;
+            });
+    },
+
+    make_search_choices: function(faq_response, $) {
+        var choices = [new Choice('restart', $('Restart'))];
+        Object.keys(faq_response).forEach(function(question) {
+            choices.push(new Choice(question, $(question)));
+        });
+        return choices;
+    }
 
 };
